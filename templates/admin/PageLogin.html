@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='Style/main.css') }}" rel="stylesheet" />
+    <title>EduPredictOps | Đổi Mật Khẩu</title>
+    <script src="{{ url_for('static', filename='Action/script.js') }}"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="left_header">
+                <img class="logo" src="{{ url_for('static', filename='images/logo.png') }}">
+                <div class="footer">    
+                    <div class="footer-text1">UIT</div>
+                    <div class="footer-text2">Trang dành cho Admin</div>
+                </div>
+            </div>
+            <div class="admin-menu">
+                <div class="admin-icon" onclick="toggleDropdown(event)">
+                    <img src="{{ url_for('static', filename='images/logo_admin.png') }}" alt="Admin Icon" />
+                </div>
+            </div>
+        </div>
+        <div class="sub-header"></div>
+        <div class="main-content">
+            <div class="button-header">
+                <button class="btn-hoc12">
+                    <div class="btn-content">
+                        <div class="btn-icon"></div>
+                        <span class="btn-text">Page DashBoard</span>
+                    </div>
+                </button>
+                <button class="btn-hoc11">
+                    <div class="btn-content">
+                        <div class="btn-icon"></div>
+                        <span class="btn-text">Page Train Model</span>
+                    </div>
+                </button>
+            </div>
+            <div class="submit_count">
+                <p>Tổng số lần submit: <span id="total-submit">0</span></p>
+                <p>Số lần submit hôm nay: <span id="today-submit">0</span></p>
+            </div>
+            <div class="login-container">
+                <h2>Đăng nhập</h2>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <ul>
+                    {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% endwith %}
+                <form action="login" method="POST" class="login-form">            
+                    <div class="form-group">
+                        <input 
+                            class="inputlogin" 
+                            type="text" 
+                            name="username" 
+                            placeholder="Username" 
+                            required 
+                        >
+                    </div>
+                    <div class="form-group">
+                        <input 
+                            class="inputlogin" 
+                            type="password" 
+                            name="password" 
+                            placeholder="Password" 
+                            required 
+                        >
+                    </div>
+                    <button type="submit" class="login-btn">Login</button>
+                </form>
+            </div>          
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+<script>
+    window.onload = function() {fetchSubmitDataFromBackend()}
+    document.addEventListener('keydown', function (e) {
+        const inputs = document.querySelectorAll('.form-group input');
+        let currentIndex = Array.from(inputs).indexOf(document.activeElement); 
+        if (e.key === 'ArrowDown') {
+            if (currentIndex < inputs.length - 1) {
+                inputs[currentIndex + 1].focus();
+            }
+        } else if (e.key === 'ArrowUp') {
+            if (currentIndex > 0) {
+                inputs[currentIndex - 1].focus();
+            }
+        }
+    });
+</script>
+
+
+
+
+
+
+
+

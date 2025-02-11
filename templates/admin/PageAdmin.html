@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='Style/main.css') }}" rel="stylesheet" />
+    <title>EduPredictOps | Train Model</title>
+    <script src="{{ url_for('static', filename='Action/script.js') }}"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="left_header">
+                <img class="logo" src="{{ url_for('static', filename='images/logo.png') }}">
+                <div class="footer">    
+                    <div class="footer-text1">UIT</div>
+                    <div class="footer-text2">Trang dành cho Admin</div>
+                </div>
+            </div>
+            <div class="admin-menu">
+                <div class="admin-icon" onclick="toggleDropdown(event)">
+                    <img src="{{ url_for('static', filename='images/logo_admin.png') }}" alt="Admin Icon" />
+                </div>
+                <div id="admin-dropdown" class="dropdown hidden">
+                    <div>Admin</div>
+                    <ul>
+                        <li>
+                            <form action="{{ url_for('admin.admin_logout') }}" method="POST" style="margin: 0;">
+                                <button type="submit">Đăng xuất</button>
+                            </form>
+                        </li>
+                        <li><a href="page_change_password">Đổi mật khẩu</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="sub-header"></div>
+        <div class="main-content">
+            <div class="button-header">
+                <button class="btn-hoc12" onclick="redirectToPageDashBoard()">
+                    <div class="btn-content">
+                        <div class="btn-icon"></div>
+                        <span class="btn-text">Page DashBoard</span>
+                    </div>
+                </button>
+                <button class="btn-hoc11">
+                    <div class="btn-content">
+                        <div class="btn-icon"></div>
+                        <span class="btn-text">Page Train Model</span>
+                    </div>
+                </button>
+            </div>
+            <div class="submit_count">
+                <p>Tổng số lần submit: <span id="total-submit">0</span></p>
+                <p>Số lần submit hôm nay: <span id="today-submit">0</span></p>
+            </div>
+            <div class="header-content">Admin Training</div>
+            <div class="select-box">
+                <label for="option1">Traning Model 12</label>
+                <input type="radio" id="option1" name="layoutOption" onclick="showLayout1in3()" checked>
+                <label for="option2">Training Model TN_TN</label>
+                <input type="radio" id="option2" name="layoutOption" onclick="showLayout2in3()">
+                <label for="option3">Training Model TN_XH</label>
+                <input type="radio" id="option3" name="layoutOption" onclick="showLayout3in3()">
+            </div>
+            <form id="layout1" class="layout" action="train_model_12" method="POST" enctype="multipart/form-data">
+                <div class="semester">Excel File</div>
+                <label for="excelFile">Excel Input:</label>
+                <input type="file" id="excelFile" name="excel_file" accept=".xlsx,.xls">
+                <button type="submit" class="btn-view-results">
+                    <div class="btn-view-content"></div>
+                    <span class="btn-view-text">Start Training</span>
+                </button>
+            </form>
+            <form id="layout2" class="layout" action="train_model_TN_TN" method="POST" enctype="multipart/form-data">
+                <div class="semester">Excel File</div>
+                <label for="excelFile">Excel Input:</label>
+                <input type="file" id="excelFile" name="excel_file" accept=".xlsx,.xls">
+                <button type="submit" class="btn-view-results">
+                    <div class="btn-view-content"></div>
+                    <span class="btn-view-text">Start Training</span>
+                </button>
+            </form>
+            <form id="layout1" class="layout" action="train_model_12" method="POST" enctype="multipart/form-data">
+                <div class="semester">Excel File</div>
+                <label for="excelFile">Excel Input:</label>
+                <input type="file" id="excelFile" name="excel_file" accept=".xlsx,.xls">
+                <button type="submit" class="btn-view-results">
+                    <div class="btn-view-content"></div>
+                    <span class="btn-view-text">Start Training</span>
+                </button>
+            </form>
+            <form id="layout2" class="layout" action="train_model_TN_TN" method="POST" enctype="multipart/form-data">
+                <div class="semester">Excel File</div>
+                <label for="excelFile">Excel Input:</label>
+                <input type="file" id="excelFile" name="excel_file" accept=".xlsx,.xls">
+                <button type="submit" class="btn-view-results">
+                    <div class="btn-view-content"></div>
+                    <span class="btn-view-text">Start Training</span>
+                </button>
+            </form>
+            <form id="layout3" class="layout" action="train_model_TN_XH" method="POST" enctype="multipart/form-data">
+                <div class="semester">Excel File</div>
+                <label for="excelFile">Excel Input:</label>
+                <input type="file" id="excelFile" name="excel_file" accept=".xlsx,.xls">
+                <button type="submit" class="btn-view-results">
+                    <div class="btn-view-content"></div>
+                    <span class="btn-view-text">Start Training</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+<script>
+    window.onload = function() {fetchSubmitDataFromBackend()}
+    window.onload = function() {
+        fetchSubmitDataFromBackend();
+        const option1 = document.getElementById('option1');
+        const option2 = document.getElementById('option2');
+        const option3 = document.getElementById('option3')
+        if (option1.checked === true) {
+            showLayout1in3();
+        } else if (option2.checked === true){
+            showLayout2in3();
+        } else {
+            showLayout3in3();
+        }
+    }
+</script>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='Style/main.css') }}" rel="stylesheet" />
+    <title>EduPredictOps | DashBoard</title>
+    <script src="{{ url_for('static', filename='Action/script.js') }}"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="left_header">
+                <img class="logo" src="{{ url_for('static', filename='images/logo.png') }}">
+                <div class="footer">    
+                    <div class="footer-text1">UIT</div>
+                    <div class="footer-text2">Trang dành cho Admin</div>
+                </div>
+            </div>
+            <div class="admin-menu">
+                <div class="admin-icon" onclick="toggleDropdown(event)">
+                    <img src="{{ url_for('static', filename='images/logo_admin.png') }}" alt="Admin Icon" />
+                </div>
+                <div id="admin-dropdown" class="dropdown hidden">
+                    <div>Admin</div>
+                    <ul>
+                        <li>
+                            <form action="{{ url_for('admin.admin_logout') }}" method="POST" style="margin: 0;">
+                                <button type="submit">Đăng xuất</button>
+                            </form>
+                        </li>
+                        <li><a href="page_change_password">Đổi mật khẩu</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="sub-header"></div>
+        <div class="main-content">
+            <div class="button-header">
+                <button class="btn-hoc12">
+                    <div class="btn-content">
+                        <div class="btn-icon"></div>
+                        <span class="btn-text">Page DashBoard</span>
+                    </div>
+                </button>
+                <button class="btn-hoc11" onclick="redirectToPageAdmin()">
+                    <div class="btn-content">
+                        <div class="btn-icon"></div>
+                        <span class="btn-text">Page Train Model</span>
+                    </div>
+                </button>
+            </div>
+            <div class="submit_count">
+                <p>Tổng số lần submit: <span id="total-submit">0</span></p>
+                <p>Số lần submit hôm nay: <span id="today-submit">0</span></p>
+            </div>
+            <div class="header-content">Performance Metrics</div>
+            <table class="metrics-table">
+                <thead>
+                    <tr>
+                        <th>Chỉ số</th>
+                        <th>Multi</th>
+                        <th>Single</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Độ trễ trung bình (Latency)</strong></td>
+                        <td><span id="multi-latency">Đang tải...</span></td>
+                        <td><span id="single-latency">Đang tải...</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Throughput trung bình</strong></td>
+                        <td><span id="multi-throughput">Đang tải...</span></td>
+                        <td><span id="single-throughput">Đang tải...</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>CPU sử dụng trung bình</strong></td>
+                        <td><span id="multi-cpu">Đang tải...</span></td>
+                        <td><span id="single-cpu">Đang tải...</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>RAM sử dụng trung bình</strong></td>
+                        <td><span id="multi-memory">Đang tải...</span></td>
+                        <td><span id="single-memory">Đang tải...</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tổng số dự đoán trung bình</strong></td>
+                        <td><span id="multi-total">Đang tải...</span></td>
+                        <td>N/A</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <script>
+                window.onload = function() {
+                    fetchPerformanceSingle();
+                    fetchPerformanceMulti()
+                    fetchSubmitDataFromBackend();
+                }
+            </script>
+        </div>
+    </div>
+</body>
+</html>
+
+
+<script>
+    document.addEventListener('keydown', function (e) {
+        const inputs = document.querySelectorAll('.form-group input');
+        let currentIndex = Array.from(inputs).indexOf(document.activeElement); 
+        if (e.key === 'ArrowDown') {
+            if (currentIndex < inputs.length - 1) {
+                inputs[currentIndex + 1].focus();
+            }
+        } else if (e.key === 'ArrowUp') {
+            if (currentIndex > 0) {
+                inputs[currentIndex - 1].focus();
+            }
+        }
+    });
+</script>

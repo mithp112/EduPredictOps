@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='Style/main.css') }}" rel="stylesheet" />
+    <title>EduPredictOps | Điểm trung bình 12</title>
+    <script src="{{ url_for('static', filename='Action/script.js') }}"></script>
+    <script>
+        window.onload = function() {
+            fetchSubmitDataFromBackend();
+            const option1 = document.getElementById('option1');
+            const option2 = document.getElementById('option2');
+            if (option1.checked === true) {
+                showLayout1();
+            } else {
+                showLayout2();
+            }
+            const option1 = document.getElementById('option1');
+            const option2 = document.getElementById('option2');
+            if (option1.checked === true) {
+                showLayout1();
+            } else {
+                showLayout2();
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="left_header">
+                <img class="logo" src="{{ url_for('static', filename='images/logo.png') }}">
+                <div class="footer">    
+                    <div class="footer-text1">UIT</div>
+                    <div class="footer-text2">Dự đoán điểm trung bình lớp 12</div>
+                </div>
+            </div>
+            <div class="right_header">
+                <img class="logo" src="{{ url_for('static', filename='images/logo_12.png') }}">
+            <div class="left_header">
+                <img class="logo" src="{{ url_for('static', filename='images/logo.png') }}">
+                <div class="footer">    
+                    <div class="footer-text1">UIT</div>
+                    <div class="footer-text2">Dự đoán điểm trung bình lớp 12</div>
+                </div>
+            </div>
+            <div class="right_header">
+                <img class="logo" src="{{ url_for('static', filename='images/logo_12.png') }}">
+            </div>
+        </div>
+        <div class="sub-header"></div>
+        <div class="main-content">
+            <div class="button-header">
+                <button class="btn-hoc12">
+                    <div class="btn-content">
+                        <div class="btn-icon"></div>
+                        <span class="btn-text">Điểm trung bình 12</span>
+                    </div>
+                </button>
+                <button class="btn-hoc11" onclick="redirectToPage2()">
+                    <div class="btn-content">
+                        <div class="btn-icon"></div>
+                        <span class="btn-text">Điểm thi Tốt Nghiệp</span>
+                    </div>
+                </button>
+            </div>
+            <div class="submit_count">
+                <p>Tổng số lần submit: <span id="total-submit">0</span></p>
+                <p>Số lần submit hôm nay: <span id="today-submit">0</span></p>
+            </div>
+            <div class="header-content">Dự đoán điểm trung bình lớp 12</div>
+            <div class="select-box">
+                <label for="option1">Nhập vào ô</label>
+                <input type="radio" id="option1" name="layoutOption" onclick="showLayout1()" checked>
+            
+                <label for="option2">Nhập bằng Excel</label>
+                <input type="radio" id="option2" name="layoutOption" onclick="showLayout2()">
+            </div>
+            <form id="layout1" class="layout" action="predict1" method="POST">
+                <div class="subjects">
+                    <div class="semester-labels">
+                        <span class="label-hk1-lop10">HK1 Lớp 10</span>
+                        <span class="label-hk2-lop10">HK2 Lớp 10</span>
+                        <span class="label-hk1-lop11">HK1 Lớp 11</span>
+                        <span class="label-hk2-lop11">HK2 Lớp 11</span>
+                    </div>
+                    <div class="content">
+                        <div class="subject-names">
+                            <span class="math-label">Điểm Toán</span>
+                            <span class="literature-label">Điểm Văn</span>
+                            <span class="physics-label">Điểm Lý</span>
+                            <span class="chemistry-label">Điểm Hóa</span>
+                            <span class="biology-label">Điểm Sinh</span>
+                            <span class="history-label">Điểm Sử</span>
+                            <span class="geography-label">Điểm Địa</span>
+                            <span class="english-label">Điểm Anh</span>
+                            <span class="civic-label">Điểm GDCD</span>
+                        </div>
+                        <div class="input">
+                            <div class="input-math">
+                                <input type="number" name="Toan_1_10" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Toan_2_10" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Toan_1_11" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Toan_2_11" min="0" max="10" step="0.1" required/>
+                            </div>
+                            <div class="input-literature">
+                                <input type="number" name="Van_1_10" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Van_2_10" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Van_1_11" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Van_2_11" min="0" max="10" step="0.1" required/>
+                            </div>
+                            <div class="input-physics">
+                                <input type="number" name="Ly_1_10" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Ly_2_10" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Ly_1_11" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Ly_2_11" min="0" max="10" step="0.1" required/>
+                            </div>
+                            <div class="input-chemistry">
+                                <input type="number" name="Hoa_1_10" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Hoa_2_10" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Hoa_1_11" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Hoa_2_11" min="0" max="10" step="0.1" required/>
+                            </div>
+                            <div class="input-biology">
+                                <input type="number" name="Sinh_1_10" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Sinh_2_10" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Sinh_1_11" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Sinh_2_11" min="0" max="10" step="0.1" required/>
+                            </div>
+                            <div class="input-history">
+                                <input type="number" name="Su_1_10" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Su_2_10" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Su_1_11" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Su_2_11" min="0" max="10" step="0.1" required/>
+                            </div>
+                            <div class="input-geography">
+                                <input type="number" name="Dia_1_10" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Dia_2_10" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Dia_1_11" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Dia_2_11" min="0" max="10" step="0.1" required/>
+                            </div>
+                            <div class="input-english">
+                                <input type="number" name="Anh_1_10" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Anh_2_10" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Anh_1_11" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="Anh_2_11" min="0" max="10" step="0.1" required/>
+                            </div>
+                            <div class="input-civic">
+                                <input type="number" name="GDCD_1_10" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="GDCD_2_10" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="GDCD_1_11" min="0" max="10" step="0.1" required/>
+                                <input type="number" name="GDCD_2_11" min="0" max="10" step="0.1" required/>
+                            </div>
+                            
+                        </div>                       
+                    </div> 
+                </div>
+                <div class="additional-info-label">
+                    Các trường hợp đặt biệt
+                </div>
+                <div class="additional-info">
+                    <div class="orphan-status">
+                        <input type="checkbox" id="orphan-checkbox" name="orphan" value="1">
+                        <label for="orphan-checkbox">Mồ côi</label>
+                    </div>
+                    <div class="kios-status">
+                        <input type="checkbox" id="kios-checkbox" name="kios" value="2">
+                        <label for="kios-checkbox">Gia đình khó khăn (Hộ nghèo hoặc cận nghèo)</label>
+                    </div>
+                </div> 
+                <div>
+                    <button type="submit" class="btn-view-results">
+                        <div class="btn-view-content"></div>
+                        <span class="btn-view-text">Xem kết quả</span>
+                    </button>
+                </div>
+            </form>
+            <form id="layout2" class="layout" action="predict_excel1" method="POST" enctype="multipart/form-data">
+                <div class="semester">Nhập điểm bằng file Excel</div>
+                <div class="tooltip">
+                    (*)
+                    <span class="tooltiptext">Yêu cầu với dữ liệu:
+                        <br>&nbsp;Dữ liệu gồm 38 cột.
+                        <br>&nbsp;Cột 1 là tên học sinh.
+                        <br>&nbsp;Cột 2-37 là điểm của 9 môn x4 kỳ.
+                        <br>&nbsp;Cột 38 là hoàn cảnh gia đình:
+                        <br>&nbsp;&nbsp;+ 0 Bình thường.
+                        <br>&nbsp;&nbsp;+ 1 Mồ Côi.
+                        <br>&nbsp;&nbsp;+ 2 Khó khăn.
+                        <br>&nbsp;&nbsp;+ 3 Mồ côi + Khó khăn.
+                    </span>
+                </div>
+                <label for="excelFile">Chọn file Excel:</label>            
+                <input type="file" id="excelFile" name="excel_file" accept=".xlsx,.xls">
+                <button type="submit" class="btn-view-results">
+                    <div class="btn-view-content"></div>
+                    <span class="btn-view-text">Xem kết quả</span>
+                    <span class="btn-view-text">Xem kết quả</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

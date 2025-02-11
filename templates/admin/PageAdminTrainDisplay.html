@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='Style/main.css') }}" rel="stylesheet" />
+    <title>EduPredictOps | Train Result</title>
+    <script src="{{ url_for('static', filename='Action/script.js') }}"></script>``
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="left_header">
+                <img class="logo" src="{{ url_for('static', filename='images/logo.png') }}">
+                <div class="footer">    
+                    <div class="footer-text1">UIT</div>
+                    <div class="footer-text2">Trang dành cho Admin</div>
+                </div>
+            </div>
+            <div class="admin-menu">
+                <div class="admin-icon" onclick="toggleDropdown(event)">
+                    <img src="{{ url_for('static', filename='images/logo_admin.png') }}" alt="Admin Icon" />
+                </div>
+                <div id="admin-dropdown" class="dropdown hidden">
+                    <div>Admin</div>
+                    <ul>
+                        <li>
+                            <form action="{{ url_for('admin.admin_logout') }}" method="POST" style="margin: 0;">
+                                <button type="submit">Đăng xuất</button>
+                            </form>
+                        </li>
+                        <li><a href="page_change_password">Đổi mật khẩu</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="sub-header"></div>
+        <div class="button-header">
+            <button class="btn-hoc12" onclick="redirectToPageDashBoard()">
+                <div class="btn-content">
+                    <div class="btn-icon"></div>
+                    <span class="btn-text">Page DashBoard</span>
+                </div>
+            </button>
+            <button class="btn-hoc11" onclick="redirectToPageAdmin()">
+                <div class="btn-content">
+                    <div class="btn-icon"></div>
+                    <span class="btn-text">Page Train Model</span>
+                </div>
+            </button>
+        </div>
+            <div class="submit_count">
+                <p>Tổng số lần submit: <span id="total-submit">0</span></p>
+                <p>Số lần submit hôm nay: <span id="today-submit">0</span></p>
+            </div>
+            <div class="header-content">Kết quả huấn luyện mô hình</div>
+            <table class="metrics-table">
+                <thead>
+                    <tr>
+                        <th>Mô hình</th>
+                        <th>Chỉ số</th>
+                        <th>Trước khi huấn luyện</th>
+                        <th>Sau khi huấn luyện</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Linear Regression -->
+                    <tr>
+                        <td rowspan="5">Linear Regression</td>
+                        <td>MAE</td>
+                        <td>{{ model_results[0].accuracy_before.MAE }}</td>
+                        <td>{{ model_results[0].accuracy_after.MAE }}</td>
+                    </tr>
+                    <tr>
+                        <td>MAPE (%)</td>
+                        <td>{{ model_results[0].accuracy_before.MAPE }}</td>
+                        <td>{{ model_results[0].accuracy_after.MAPE }}</td>
+                    </tr>
+                    <tr>
+                        <td>MSE</td>
+                        <td>{{ model_results[0].accuracy_before.MSE }}</td>
+                        <td>{{ model_results[0].accuracy_after.MSE }}</td>
+                    </tr>
+                    <tr>
+                        <td>RMSE</td>
+                        <td>{{ model_results[0].accuracy_before.RMSE }}</td>
+                        <td>{{ model_results[0].accuracy_after.RMSE }}</td>
+                    </tr>
+                    <tr>
+                        <td>Accuracy (%)</td>
+                        <td>{{ model_results[0].accuracy_before.Accuracy }}%</td>
+                        <td>{{ model_results[0].accuracy_after.Accuracy }}%</td>
+                    </tr>
+                    
+                    <!-- MLP -->
+                    <tr>
+                        <td rowspan="5">MLP</td>
+                        <td>MAE</td>
+                        <td>{{ model_results[1].accuracy_before.MAE }}</td>
+                        <td>{{ model_results[1].accuracy_after.MAE }}</td>
+                    </tr>
+                    <tr>
+                        <td>MAPE (%)</td>
+                        <td>{{ model_results[1].accuracy_before.MAPE }}</td>
+                        <td>{{ model_results[1].accuracy_after.MAPE }}</td>
+                    </tr>
+                    <tr>
+                        <td>MSE</td>
+                        <td>{{ model_results[1].accuracy_before.MSE }}</td>
+                        <td>{{ model_results[1].accuracy_after.MSE }}</td>
+                    </tr>
+                    <tr>
+                        <td>RMSE</td>
+                        <td>{{ model_results[1].accuracy_before.RMSE }}</td>
+                        <td>{{ model_results[1].accuracy_after.RMSE }}</td>
+                    </tr>
+                    <tr>
+                        <td>Accuracy (%)</td>
+                        <td>{{ model_results[1].accuracy_before.Accuracy }}%</td>
+                        <td>{{ model_results[1].accuracy_after.Accuracy }}%</td>
+                    </tr>
+
+                    <!-- LSTM -->
+                    <tr>
+                        <td rowspan="5">LSTM</td>
+                        <td>MAE</td>
+                        <td>{{ model_results[2].accuracy_before.MAE }}</td>
+                        <td>{{ model_results[2].accuracy_after.MAE }}</td>
+                    </tr>
+                    <tr>
+                        <td>MAPE (%)</td>
+                        <td>{{ model_results[2].accuracy_before.MAPE }}</td>
+                        <td>{{ model_results[2].accuracy_after.MAPE }}</td>
+                    </tr>
+                    <tr>
+                        <td>MSE</td>
+                        <td>{{ model_results[2].accuracy_before.MSE }}</td>
+                        <td>{{ model_results[2].accuracy_after.MSE }}</td>
+                    </tr>
+                    <tr>
+                        <td>RMSE</td>
+                        <td>{{ model_results[2].accuracy_before.RMSE }}</td>
+                        <td>{{ model_results[2].accuracy_after.RMSE }}</td>
+                    </tr>
+                    <tr>
+                        <td>Accuracy (%)</td>
+                        <td>{{ model_results[2].accuracy_before.Accuracy }}%</td>
+                        <td>{{ model_results[2].accuracy_after.Accuracy }}%</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        
+            <div id="actions">
+                <form action="accept_trained_models" method="POST">
+                    <input  type="hidden" name="type_train" value="{{ type_train }}">
+                    <button class="btn-view-results" type="submit">
+                        <div class="btn-view-content"></div>
+                        <span class="btn-view-text">Chấp nhận dữ liệu </span>
+                    </button>
+                </form>
+                <form action="reject_trained_models" method="POST">
+                    <input  type="hidden" name="type_train" value="{{ type_train }}">
+                    <button class="btn-view-results" type="submit">
+                        <div class="btn-view-content"></div>
+                        <span class="btn-view-text">Từ chối dữ liệu </span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+
+<script>
+    window.onload = function() {fetchSubmitDataFromBackend()}
+</script>
