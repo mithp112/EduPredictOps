@@ -1,46 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-    <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='Style/main.css') }}" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduPredictOps | Điểm thi tốt nghiệp</title>
-    <script src="{{ url_for('static', filename='Action/script.js') }}"></script>
-    <script>
-        // Khi trang tải, gọi hàm lấy dữ liệu
-        window.onload = function() {
-            fetchSubmitDataFromBackend();
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='Style/main.css') }}" rel="stylesheet">
 </head>
 <body>
     <div class="firework-container"></div>
-    <div class="firework-container"></div>
-    <div class="container"> 
-        <div class="header">
+
+    <div class="container">
+        <header class="header">
             <div class="left_header">
-                <img class="logo" src="{{ url_for('static', filename='images/logo.png') }}">
+                <img class="logo" src="{{ url_for('static', filename='images/logo.png') }}" alt="UIT Logo">
                 <div class="footer">    
                     <div class="footer-text1">UIT</div>
                     <div class="footer-text2">Dự đoán kết quả thi THPT</div>
                 </div>
             </div>
             <div class="right_header">
-                <img class="logo" src="{{ url_for('static', filename='images/logo_TN.png') }}">
-            <div class="left_header">
-                <img class="logo" src="{{ url_for('static', filename='images/logo.png') }}">
-                <div class="footer">    
-                    <div class="footer-text1">UIT</div>
-                    <div class="footer-text2">Dự đoán kết quả thi THPT</div>
-                </div>
+                <img class="logo" src="{{ url_for('static', filename='images/logo_TN.png') }}" alt="National Exam Logo">
             </div>
-            <div class="right_header">
-                <img class="logo" src="{{ url_for('static', filename='images/logo_TN.png') }}">
-            </div>
-        </div>
+        </header>
+
         <div class="sub-header"></div>
-        <div class="main-content">
+
+        <main class="main-content">
             <div class="button-header">
-                <button class="btn-hoc11" onclick="redirectToPage1()">
                 <button class="btn-hoc11" onclick="redirectToPage1()">
                     <div class="btn-content">
                         <div class="btn-icon"></div>
@@ -48,40 +35,42 @@
                     </div>
                 </button>
                 <button class="btn-hoc12" onclick="goBack()">
-                <button class="btn-hoc12" onclick="goBack()">
                     <div class="btn-content">
                         <div class="btn-icon"></div>
-                        <span class="btn-text">Điểm thi Tốt Nghiệp<span>
+                        <span class="btn-text">Điểm thi Tốt Nghiệp</span>
                     </div>
                 </button>
             </div>
+
             <div class="submit_count">
                 <p>Tổng số lần submit: <span id="total-submit">0</span></p>
                 <p>Số lần submit hôm nay: <span id="today-submit">0</span></p>
             </div>
-            <div class="header-content">Kết quả dự đoán điểm thi THPT</div>
-                <!-- Nếu dự đoán bằng Excel thì sẽ có giá trị names được trả về -> hiển thị phần chuyển kết quả và download -->
-                {% if names %}
-                <div class="navigation">
-                    <form id="downloadForm" action="download_excel2" method="post">
-                        <button id="prevBtn" type="button" onclick="prevResult2()">&laquo; Previous</button>
-                        <div id="outputIndex"> 0 </div>
-                        <div class="output-name" id="outputName">{{ names[0] }}</div>
-                        <button id="nextBtn" type="button" onclick="nextResult2()">Next &raquo;</button>
-                        <button id="downloadBtn" type="submit">Download</button>
-                        <input type="hidden" name="names" value="{{ names }}">
-                        <input type="hidden" name="kq_Model1" value="{{ kq_Model1 }}">
-                        <input type="hidden" name="kq_Model2" value="{{ kq_Model2 }}">
-                        <input type="hidden" name="kq_Model3" value="{{ kq_Model3 }}">
-                        <input type="hidden" name="subjects" value="{{ subjects }}">
-                    </form>
-                </div>
-                {% endif %}
-            <div class="subjects">
+
+            <h1 class="header-content">Kết quả dự đoán điểm thi THPT</h1>
+
+            {% if names %}
+            <div class="navigation">
+                <form id="downloadForm" action="download_excel2" method="post">
+                    <button id="prevBtn" type="button" onclick="prevResult2()">&laquo; Previous</button>
+                    <div id="outputIndex">0</div>
+                    <div class="output-name" id="outputName">{{ names[0] }}</div>
+                    <button id="nextBtn" type="button" onclick="nextResult2()">Next &raquo;</button>
+                    <button id="downloadBtn" type="submit">Download</button>
+                    
+                    <input type="hidden" name="names" value="{{ names }}">
+                    <input type="hidden" name="kq_Model1" value="{{ kq_Model1 }}">
+                    <input type="hidden" name="kq_Model2" value="{{ kq_Model2 }}">
+                    <input type="hidden" name="kq_Model3" value="{{ kq_Model3 }}">
+                    <input type="hidden" name="subjects" value="{{ subjects }}">
+                </form>
+            </div>
+            {% endif %}
+
             <div class="subjects">
                 <div class="model1">
-                    <div class="model-infor"> Linear Regression</div>
-                    <div class="semester"> Điểm học thi tốt nghiệp</div>
+                    <div class="model-infor">Linear Regression</div>
+                    <div class="semester">Điểm học thi tốt nghiệp</div>
                     <div class="subject-labels">
                         <span class="math-label">Điểm Toán</span>
                         <span class="literature-label">Điểm Văn</span>
@@ -99,9 +88,10 @@
                         <div class="output-history" id="model1English">{{ kq_Model1['Anh_1'][0] }}</div>
                     </div>
                 </div>
+
                 <div class="model2">
                     <div class="model-infor">Multilayer Perceptron</div>
-                    <div class="semester"> Điểm học thi tốt nghiệp</div>
+                    <div class="semester">Điểm học thi tốt nghiệp</div>
                     <div class="subject-labels">
                         <span class="math-label">Điểm Toán</span>
                         <span class="literature-label">Điểm Văn</span>
@@ -119,9 +109,10 @@
                         <div class="output-history" id="model2English">{{ kq_Model2['Anh_1'][0] }}</div>
                     </div>
                 </div>
+
                 <div class="model3">
                     <div class="model-infor">Long Short Term Memory</div>
-                    <div class="semester"> Điểm học thi tốt nghiệp</div>
+                    <div class="semester">Điểm học thi tốt nghiệp</div>
                     <div class="subject-labels">
                         <span class="math-label">Điểm Toán</span>
                         <span class="literature-label">Điểm Văn</span>
@@ -140,151 +131,91 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <form action="page6" method="POST">
-            <input type="hidden" name="subjects" value="{{ subjects }}">
-            <button class="btn-view-results" type="submit">
-                <div class="btn-view-content"></div>
-                <span class="btn-view-text">Mô tả dữ liệu</span>
-                <span class="btn-view-text">Mô tả dữ liệu</span>
-            </button>
-        </form>
-        <div>
-            <button class="btn-back" onclick="goBack()">
-        </form>
-        <div>
-            <button class="btn-back" onclick="goBack()">
-                <div class="btn-view-content"></div>
-                <span class="btn-view-text">Trở về</span>
-                <span class="btn-view-text">Trở về</span>
-            </button>
-        </div>
+
+            <div class="actions">
+                <form action="page6" method="POST">
+                    <input type="hidden" name="subjects" value="{{ subjects }}">
+                    <button class="btn-view-results" type="submit">
+                        <div class="btn-view-content"></div>
+                        <span class="btn-view-text">Mô tả dữ liệu</span>
+                    </button>
+                </form>
+
+                <button class="btn-back" onclick="goBack()">
+                    <div class="btn-view-content"></div>
+                    <span class="btn-view-text">Trở về</span>
+                </button>
+            </div>
+        </main>
     </div>
+
+    <script src="{{ url_for('static', filename='Action/script.js') }}"></script>
+    <script>
+        window.onload = function() {
+            fetchSubmitDataFromBackend();
+        }
+    </script>
+
+    {% if names %}
+    <script>
+        let index = 0;
+        const names = {{ names|tojson|safe }};
+        const kq_Model1 = {{ kq_Model1|tojson|safe }};
+        const kq_Model2 = {{ kq_Model2|tojson|safe }};
+        const kq_Model3 = {{ kq_Model3|tojson|safe }};
+        
+        function updateModelDisplay2() {
+            document.getElementById('outputName').textContent = names[index];
+            document.getElementById('outputIndex').textContent = index;
+
+            const model1Ids = ['Math', 'Literature', 'Physics', 'Chemistry', 'Biology', 'English'];
+            const model2Ids = ['Math', 'Literature', 'Physics', 'Chemistry', 'Biology', 'English'];
+            const model3Ids = ['Math', 'Literature', 'Physics', 'Chemistry', 'Biology', 'English'];
+            const subjects = ['Toán', 'Văn', 'Lý', 'Hóa', 'Sinh', 'Anh'];
+
+            model1Ids.forEach((id, i) => {
+                document.getElementById(`model1${id}`).textContent = kq_Model1[`${subjects[i]}_1`][index];
+                document.getElementById(`model2${id}`).textContent = kq_Model2[`${subjects[i]}_1`][index];
+                document.getElementById(`model3${id}`).textContent = kq_Model3[`${subjects[i]}_1`][index];
+            });
+        }
+
+        function prevResult2() {
+            index = index > 0 ? index - 1 : names.length - 1;
+            updateModelDisplay2();
+        }
+
+        function nextResult2() {
+            index = index < names.length - 1 ? index + 1 : 0;
+            updateModelDisplay2();
+        }
+
+        document.addEventListener('DOMContentLoaded', updateModelDisplay2);
+    </script>
+    {% endif %}
+
+    <script>
+        function fireworkEffect() {
+            const container = document.querySelector('.firework-container');
+            
+            for (let i = 0; i < 30; i++) {
+                const firework = document.createElement('div');
+                firework.className = 'firework';
+                firework.style.width = firework.style.height = `${Math.random() * 30 + 10}px`;
+                firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                firework.style.left = `${Math.random() * 100}vw`;
+                firework.style.top = `${Math.random() * 100}vh`;
+                firework.style.animationDelay = `${Math.random() * 1}s`;
+                
+                container.appendChild(firework);
+
+                firework.addEventListener('animationend', () => firework.remove());
+            }
+        }
+
+        window.addEventListener('load', () => {
+            setTimeout(fireworkEffect, 300);
+        });
+    </script>
 </body>
 </html>
-
-{% if names %}
-<script>
-    let index = 0; // Biến lưu chỉ số hiện tại
-    const names = {{ names|tojson|safe }};
-    const kq_Model1 = {{ kq_Model1|tojson|safe }};
-    const kq_Model2 = {{ kq_Model2|tojson|safe }};
-    const kq_Model3 = {{ kq_Model3|tojson|safe }};
-    
-    // Hàm để cập nhật tất cả các giá trị hiển thị dựa trên currentIndex
-    function updateModelDisplay2() {
-        // Cập nhật giá trị cho tên
-        document.getElementById('outputName').textContent = names[index];
-        document.getElementById('outputIndex').textContent = index;
-
-        // Cập nhật giá trị cho Model 1
-        document.getElementById('model1Math').textContent = kq_Model1['Toán_1'][index];
-        document.getElementById('model1Literature').textContent = kq_Model1['Văn_1'][index];
-        document.getElementById('model1Physics').textContent = kq_Model1['Lý_1'][index];
-        document.getElementById('model1Chemistry').textContent = kq_Model1['Hóa_1'][index];
-        document.getElementById('model1Biology').textContent = kq_Model1['Sinh_1'][index];
-        document.getElementById('model1English').textContent = kq_Model1['Anh_1'][index];
-
-        // Cập nhật giá trị cho Model 2
-        document.getElementById('model2Math').textContent = kq_Model2['Toán_1'][index];
-        document.getElementById('model2Literature').textContent = kq_Model2['Văn_1'][index];
-        document.getElementById('model2Physics').textContent = kq_Model2['Lý_1'][index];
-        document.getElementById('model2Chemistry').textContent = kq_Model2['Hóa_1'][index];
-        document.getElementById('model2Biology').textContent = kq_Model2['Sinh_1'][index];
-        document.getElementById('model2English').textContent = kq_Model2['Anh_1'][index];
-
-        // Cập nhật giá trị cho Model 3
-        document.getElementById('model3Math').textContent = kq_Model3['Toán_1'][index];
-        document.getElementById('model3Literature').textContent = kq_Model3['Văn_1'][index];
-        document.getElementById('model3Physics').textContent = kq_Model3['Lý_1'][index];
-        document.getElementById('model3Chemistry').textContent = kq_Model3['Hóa_1'][index];
-        document.getElementById('model3Biology').textContent = kq_Model3['Sinh_1'][index];
-        document.getElementById('model3English').textContent = kq_Model3['Anh_1'][index];
-    }
-
-    // Hàm để chuyển sang dữ liệu trước đó
-    function prevResult2() {
-        console.log(index);
-        if (index > 0) {
-            index--;
-        }
-        else{
-            index = names.length -1;
-        }
-        updateModelDisplay2();
-    }
-
-    // Hàm để chuyển sang dữ liệu tiếp theo
-    function nextResult2() {
-        console.log(index);
-        if (index < names.length - 1) {
-            index++;
-        }
-        else{
-            index = 0
-        }
-        updateModelDisplay2();
-    }
-
-    // Cập nhật khi trang load lần đầu
-    document.addEventListener('DOMContentLoaded', updateModelDisplay2);
-</script>
-{% endif %}
-
-<script>
-    function fireworkEffect() {
-        const container = document.querySelector('.firework-container');
-        
-        for (let i = 0; i < 30; i++) {
-            const firework = document.createElement('div');
-            firework.className = 'firework';
-            firework.style.width = firework.style.height = Math.random() * 30 + 10 + 'px';
-            firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-            firework.style.left = Math.random() * 100 + 'vw';
-            firework.style.top = Math.random() * 100 + 'vh';
-            firework.style.animationDelay = Math.random() * 1 + 's';
-            
-            // Thêm pháo hoa vào container
-            container.appendChild(firework);
-
-            // Xóa pháo hoa sau khi hiệu ứng kết thúc
-            firework.addEventListener('animationend', () => firework.remove());
-        }
-    }
-
-    // Tự động chạy hiệu ứng khi trang load
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            fireworkEffect();
-        }, 300); // Đợi 0.3s sau khi load trang rồi mới chạy hiệu ứng
-    });
-</script>
-
-<script>
-    function fireworkEffect() {
-        const container = document.querySelector('.firework-container');
-        
-        for (let i = 0; i < 30; i++) {
-            const firework = document.createElement('div');
-            firework.className = 'firework';
-            firework.style.width = firework.style.height = Math.random() * 30 + 10 + 'px';
-            firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-            firework.style.left = Math.random() * 100 + 'vw';
-            firework.style.top = Math.random() * 100 + 'vh';
-            firework.style.animationDelay = Math.random() * 1 + 's';
-            
-            // Thêm pháo hoa vào container
-            container.appendChild(firework);
-
-            // Xóa pháo hoa sau khi hiệu ứng kết thúc
-            firework.addEventListener('animationend', () => firework.remove());
-        }
-    }
-
-    // Tự động chạy hiệu ứng khi trang load
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            fireworkEffect();
-        }, 300); // Đợi 0.3s sau khi load trang rồi mới chạy hiệu ứng
-    });
-</script>

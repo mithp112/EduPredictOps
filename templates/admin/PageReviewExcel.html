@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trình Quản Lý File Excel</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Trình Quản Lý File Excel</h1>
+        
+        <div class="path-display">
+            <div>Đường dẫn: <strong>E:/download/scorePredict</strong></div>
+            <button class="btn-refresh-files" onclick="loadFileList()">Cập nhật danh sách</button>
+        </div>
+        
+        <div class="file-list" id="fileList">
+            <h2>Danh sách file Excel</h2>
+            <div class="loading" id="loadingFiles">Đang tải danh sách file...</div>
+            <div id="fileListContent"></div>
+        </div>
+        
+        <div class="excel-viewer" id="excelViewer">
+            <h2 id="currentFile">Tên file: </h2>
+            <div id="viewMode">
+                <div id="spreadsheetContainer">
+                    <table id="excelTable">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>A</th>
+                                <th>B</th>
+                                <th>C</th>
+                                <th>D</th>
+                                <th>E</th>
+                                <th>F</th>
+                                <th>G</th>
+                                <th>H</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dữ liệu mẫu -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="editMode" style="display: none;">
+                <div id="editSpreadsheetContainer">
+                    <table id="editExcelTable">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>A</th>
+                                <th>B</th>
+                                <th>C</th>
+                                <th>D</th>
+                                <th>E</th>
+                                <th>F</th>
+                                <th>G</th>
+                                <th>H</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dữ liệu mẫu trong chế độ chỉnh sửa -->
+                        </tbody>
+                    </table>
+                    <div class="editor">
+                        <label for="cellEditor">Chỉnh sửa ô: </label>
+                        <input type="text" id="cellEditor" style="width: 300px; padding: 5px;">
+                        <button onclick="applyCellEdit()">Áp dụng</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn-refresh" onclick="refreshFile()">Làm mới</button>
+                <button class="btn-save" onclick="saveChanges()" id="saveButton" style="display: none;">Lưu thay đổi</button>
+                <button class="btn-close" onclick="closeFile()">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dữ liệu mẫu cho các file Excel
+        const sampleData = {
+            'HocSinh_Lop10A.xlsx': [
+                ['STT', 'Họ và tên', 'Ngày sinh', 'Giới tính', 'Điểm TB', 'Xếp loại'],
+                ['1', 'Nguyễn Văn A', '12/05/2008', 'Nam', '8.5', 'Giỏi'],
+                ['2', 'Trần Thị B', '23/09/2008', 'Nữ', '9.2', 'Xuất sắc'],
+                ['3', 'Lê Văn C', '05/11/2008', 'Nam', '7.8', 'Khá'],
+                ['4', 'Phạm Thị D', '18/03/2009', 'Nữ', '8.0', 'Giỏi'],
+                ['5', 'Hoàng Văn E', '30/07/2008', 'Nam', '6.5', 'Trung bình']
+            ],
+            'DiemThi_HK1_2024.xlsx': [
+                ['STT', 'Lớp', 'Môn học', 'Điểm TB', 'Điểm cao nhất', 'Điểm thấp nhất'],
+                ['1', '10A', 'Toán', '7.6', '9.8', '5.0'],
+                ['2', '10A', 'Văn', '7.2', '9.5', '4.8'],
+                ['3', '10A', 'Anh', '8.0', '10.0', '5.5'],
+                ['4', '10A', 'Lý', '7.8', '9.7', '5.2'],
+                ['5', '10A', 'Hóa', '7.5', '9.6', '4.5']
+            ],
+            'DuDoanDiem_THPT.xlsx': [
+                ['STT', 'Họ và tên', 'Môn Toán', 'Môn Văn', 'Môn Anh', 'Tổng điểm', 'Dự đoán'],
+                ['1', 'Nguyễn Văn A', '8.5', '7.5', '9.0', '25.0', 'Đỗ NV1'],
+                ['2', 'Trần Thị B', '9.0', '8.5', '9.5', '27.0', 'Đỗ NV1'],
+                ['3', 'Lê Văn C', '7.0', '7.0', '8.0', '22.0', 'Đỗ NV2'],
+                ['4', 'Phạm Thị D', '8.0', '7.5', '8.0', '23.5', 'Đỗ NV1'],
+                ['5', 'Hoàng Văn E', '6.5', '6.0', '7.0', '19.5', 'Đỗ NV3']
+            ]
+        };
+
+        let currentFile = '';
+        let editMode = false;
+        let selectedCell = null;
+        const folderPath = 'E:/download/scorePredict';
+
+        // Hàm tải danh sách file
+        function loadFileList() {
+            document.getElementById('loadingFiles').style.display = 'block';
+            document.getElementById('fileListContent').innerHTML = '';
+            
+            // Mô phỏng việc tải danh sách file từ server
+            setTimeout(() => {
+                // Trong môi trường thực tế, đây sẽ là một cuộc gọi API để lấy danh sách file
+                getFileList(folderPath).then(files => {
+                    document.getElementById('loadingFiles').style.display = 'none';
+                    
+                    if (files.length === 0) {
+                        document.getElementById('fileListContent').innerHTML = 
+                            '<div class="no-files">Không tìm thấy file Excel nào trong thư mục</div>';
+                        return;
+                    }
+                    
+                    const fileListContent = document.getElementById('fileListContent');
+                    fileListContent.innerHTML = '';
+                    
+                    files.forEach(file => {
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'file-item';
+                        fileItem.innerHTML = `
+                            <span class="file-name">${file}</span>
+                            <div class="buttons">
+                                <button class="btn-view" onclick="viewFile('${file}')">Xem</button>
+                                <button class="btn-edit" onclick="editFile('${file}')">Chỉnh sửa</button>
+                            </div>
+                        `;
+                        fileListContent.appendChild(fileItem);
+                    });
+                });
+            }, 500); // Mô phỏng độ trễ mạng
+        }
+
+        // Hàm mô phỏng việc lấy danh sách file từ server
+        async function getFileList(folderPath) {
+            // Trong môi trường thực tế, đây sẽ là một cuộc gọi API đến server
+            // để lấy danh sách file Excel trong thư mục
+            
+            // Mô phỏng kết quả trả về
+            return Object.keys(sampleData);
+            
+            // Trong môi trường Node.js thực tế, có thể sử dụng mã tương tự:
+            /*
+            const fs = require('fs');
+            const path = require('path');
+            
+            return new Promise((resolve, reject) => {
+                fs.readdir(folderPath, (err, files) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    
+                    // Lọc chỉ các file Excel
+                    const excelFiles = files.filter(file => {
+                        const ext = path.extname(file).toLowerCase();
+                        return ext === '.xlsx' || ext === '.xls';
+                    });
+                    
+                    resolve(excelFiles);
+                });
+            });
+            */
+        }
+
+        // Hàm mô phỏng việc đọc file Excel từ server
+        async function readExcelFile(filePath) {
+            // Trong môi trường thực tế, đây sẽ là một cuộc gọi API đến server
+            // để đọc nội dung file Excel
+            
+            // Trả về dữ liệu mẫu
+            return sampleData[filePath.split('/').pop()] || [];
+            
+            // Trong môi trường Node.js thực tế, có thể sử dụng thư viện như ExcelJS:
+            /*
+            const ExcelJS = require('exceljs');
+            
+            const workbook = new ExcelJS.Workbook();
+            await workbook.xlsx.readFile(filePath);
+            
+            const worksheet = workbook.getWorksheet(1);
+            const data = [];
+            
+            worksheet.eachRow((row, rowNumber) => {
+                const rowData = [];
+                row.eachCell((cell, colNumber) => {
+                    rowData.push(cell.value);
+                });
+                data.push(rowData);
+            });
+            
+            return data;
+            */
+        }
+
+        // Hàm mở file để xem
+        function viewFile(filename) {
+            currentFile = filename;
+            editMode = false;
+            document.getElementById('currentFile').textContent = `Tên file: ${filename}`;
+            document.getElementById('excelViewer').style.display = 'block';
+            document.getElementById('viewMode').style.display = 'block';
+            document.getElementById('editMode').style.display = 'none';
+            document.getElementById('saveButton').style.display = 'none';
+            
+            loadExcelData(filename);
+        }
+
+        // Hàm mở file để chỉnh sửa
+        function editFile(filename) {
+            currentFile = filename;
+            editMode = true;
+            document.getElementById('currentFile').textContent = `Tên file: ${filename} (Chế độ chỉnh sửa)`;
+            document.getElementById('excelViewer').style.display = 'block';
+            document.getElementById('viewMode').style.display = 'none';
+            document.getElementById('editMode').style.display = 'block';
+            document.getElementById('saveButton').style.display = 'inline-block';
+            
+            loadExcelDataForEdit(filename);
+        }
+
+        // Hàm đóng file hiện tại
+        function closeFile() {
+            document.getElementById('excelViewer').style.display = 'none';
+            currentFile = '';
+            editMode = false;
+        }
+
+        // Hàm làm mới file đang mở
+        function refreshFile() {
+            if (currentFile) {
+                if (editMode) {
+                    loadExcelDataForEdit(currentFile);
+                } else {
+                    loadExcelData(currentFile);
+                }
+            }
+        }
+
+        // Hàm lưu các thay đổi
+        function saveChanges() {
+            // Trong môi trường thực tế, đây sẽ là một cuộc gọi API đến server
+            // để lưu nội dung file Excel đã chỉnh sửa
+            
+            alert(`Đã lưu thay đổi cho file ${currentFile}`);
+            viewFile(currentFile); // Chuyển sang chế độ xem sau khi lưu
+        }
+
+        // Hàm tải dữ liệu Excel để xem
+        function loadExcelData(filename) {
+            const filePath = `${folderPath}/${filename}`;
+            
+            // Đọc dữ liệu Excel
+            readExcelFile(filePath)
+                .then(data => {
+                    const tableBody = document.getElementById('excelTable').getElementsByTagName('tbody')[0];
+                    tableBody.innerHTML = '';
+                    
+                    if (data && data.length > 0) {
+                        for (let rowIndex = 0; rowIndex < data.length; rowIndex++) {
+                            const tr = document.createElement('tr');
+                            
+                            // Thêm số hàng
+                            const rowHeader = document.createElement('th');
+                            rowHeader.textContent = rowIndex + 1;
+                            tr.appendChild(rowHeader);
+                            
+                            for (let colIndex = 0; colIndex < data[rowIndex].length; colIndex++) {
+                                const td = document.createElement('td');
+                                td.textContent = data[rowIndex][colIndex];
+                                tr.appendChild(td);
+                            }
+                            
+                            tableBody.appendChild(tr);
+                        }
+                    } else {
+                        tableBody.innerHTML = '<tr><td colspan="9">Không có dữ liệu</td></tr>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi đọc file Excel:', error);
+                    alert(`Lỗi khi đọc file ${filename}: ${error.message}`);
+                });
+        }
+
+        // Hàm tải dữ liệu Excel để chỉnh sửa
+        function loadExcelDataForEdit(filename) {
+            const filePath = `${folderPath}/${filename}`;
+            
+            // Đọc dữ liệu Excel
+            readExcelFile(filePath)
+                .then(data => {
+                    const tableBody = document.getElementById('editExcelTable').getElementsByTagName('tbody')[0];
+                    tableBody.innerHTML = '';
+                    
+                    if (data && data.length > 0) {
+                        for (let rowIndex = 0; rowIndex < data.length; rowIndex++) {
+                            const tr = document.createElement('tr');
+                            
+                            // Thêm số hàng
+                            const rowHeader = document.createElement('th');
+                            rowHeader.textContent = rowIndex + 1;
+                            tr.appendChild(rowHeader);
+                            
+                            for (let colIndex = 0; colIndex < data[rowIndex].length; colIndex++) {
+                                const td = document.createElement('td');
+                                td.textContent = data[rowIndex][colIndex];
+                                td.dataset.row = rowIndex;
+                                td.dataset.col = colIndex;
+                                td.onclick = function() { selectCell(this); };
+                                tr.appendChild(td);
+                            }
+                            
+                            tableBody.appendChild(tr);
+                        }
+                    } else {
+                        tableBody.innerHTML = '<tr><td colspan="9">Không có dữ liệu</td></tr>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi đọc file Excel:', error);
+                    alert(`Lỗi khi đọc file ${filename}: ${error.message}`);
+                });
+        }
+
+        // Hàm chọn ô để chỉnh sửa
+        function selectCell(cell) {
+            // Xóa lớp được chọn từ ô trước đó
+            if (selectedCell) {
+                selectedCell.classList.remove('selected-cell');
+            }
+            
+            // Đánh dấu ô mới được chọn
+            selectedCell = cell;
+            cell.classList.add('selected-cell');
+            
+            // Cập nhật ô nhập liệu
+            document.getElementById('cellEditor').value = cell.textContent;
+        }
+
+        // Hàm áp dụng chỉnh sửa ô
+        function applyCellEdit() {
+            if (selectedCell) {
+                const newValue = document.getElementById('cellEditor').value;
+                selectedCell.textContent = newValue;
+                
+                // Trong môi trường thực tế, có thể cập nhật dữ liệu trực tiếp
+                // vào một cấu trúc dữ liệu để lưu lại sau này
+            }
+        }
+
+        // Tải danh sách file khi trang được tải
+        window.onload = function() {
+            loadFileList();
+        };
+    </script>
+</body>
+</html>
+
+
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f4f4f4;
+    }
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+        color: #2c3e50;
+        text-align: center;
+    }
+    .file-list {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    .file-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    .file-item:last-child {
+        border-bottom: none;
+    }
+    .file-item:hover {
+        background-color: #f9f9f9;
+    }
+    .file-name {
+        font-weight: bold;
+        color: #2980b9;
+        cursor: pointer;
+    }
+    .buttons {
+        display: flex;
+        gap: 10px;
+    }
+    button {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    .btn-view {
+        background-color: #3498db;
+        color: white;
+    }
+    .btn-edit {
+        background-color: #2ecc71;
+        color: white;
+    }
+    .btn-close {
+        background-color: #e74c3c;
+        color: white;
+    }
+    .excel-viewer {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 15px;
+        margin-top: 20px;
+        min-height: 300px;
+        display: none;
+    }
+    .path-display {
+        background-color: #eee;
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .controls {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        justify-content: center;
+    }
+    .btn-refresh {
+        background-color: #9b59b6;
+        color: white;
+        padding: 10px 20px;
+    }
+    .btn-save {
+        background-color: #f39c12;
+        color: white;
+        padding: 10px 20px;
+    }
+    .btn-refresh-files {
+        background-color: #3498db;
+        color: white;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    table, th, td {
+        border: 1px solid #ddd;
+    }
+    th, td {
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    .selected-cell {
+        background-color: #e3f2fd;
+    }
+    .editor {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+    }
+    .loading {
+        text-align: center;
+        padding: 20px;
+        font-style: italic;
+        color: #7f8c8d;
+    }
+    .no-files {
+        text-align: center;
+        padding: 20px;
+        color: #7f8c8d;
+    }
+</style>

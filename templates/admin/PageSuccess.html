@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông Báo Thành Công</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+            padding: 40px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in-out;
+            position: relative;
+            z-index: 10;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 30px;
+            animation: scaleIn 0.5s ease-in-out;
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        
+        .message {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 30px;
+        }
+        
+        .details {
+            background-color: #f5f7fa;
+            border-radius: 6px;
+            padding: 20px;
+            text-align: left;
+            margin-bottom: 30px;
+        }
+        
+        .details h2 {
+            font-size: 18px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .details-item {
+            display: flex;
+            margin-bottom: 12px;
+        }
+        
+        .details-label {
+            font-weight: 600;
+            width: 40%;
+            color: #555;
+        }
+        
+        .details-value {
+            width: 60%;
+        }
+        
+        .button {
+            display: inline-block;
+            background-color: #4285f4;
+            color: white;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .button:hover {
+            background-color: #3367d6;
+        }
+        
+        .secondary-action {
+            color: #4285f4;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 20px;
+        }
+        
+        .secondary-action:hover {
+            text-decoration: underline;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            color: #888;
+            font-size: 14px;
+        }
+        
+        .footer a {
+            color: #4285f4;
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .divider {
+            border-top: 1px solid #eee;
+            margin: 30px 0;
+        }
+        
+        /* Hiệu ứng chúc mừng */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            overflow: hidden;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #ff0000;
+            opacity: 0.7;
+            animation: fall linear forwards;
+        }
+        
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+        
+        .celebration-text {
+            position: absolute;
+            font-size: 32px;
+            font-weight: bold;
+            color: transparent;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+            animation: celebrationText 3s ease-out forwards;
+            background: linear-gradient(45deg, #ff0000, #ff7700, #ffff00, #00ff00, #0000ff, #8b00ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            background-size: 400% 400%;
+            animation: celebrationText 3s ease-out forwards, gradient 5s ease infinite;
+        }
+        
+        @keyframes celebrationText {
+            0% {
+                top: -50px;
+                opacity: 0;
+                transform: translateX(-50%) scale(0.8);
+            }
+            30% {
+                top: 10px;
+                opacity: 1;
+                transform: translateX(-50%) scale(1.2);
+            }
+            70% {
+                top: 10px;
+                opacity: 1;
+                transform: translateX(-50%) scale(1.2);
+            }
+            100% {
+                top: -50px;
+                opacity: 0;
+                transform: translateX(-50%) scale(0.8);
+            }
+        }
+        
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        /* Hiệu ứng lấp lánh */
+        .sparkle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: white;
+            box-shadow: 0 0 10px 2px gold;
+            opacity: 0;
+            animation: sparkle 2s ease-in-out infinite;
+            z-index: 11;
+        }
+        
+        @keyframes sparkle {
+            0% {
+                opacity: 0;
+                transform: scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0);
+            }
+        }
+        
+        /* Hiệu ứng ruy băng */
+        .ribbon {
+            position: absolute;
+            width: 4px;
+            height: 80px;
+            background: linear-gradient(to bottom, transparent, red, transparent);
+            animation: ribbon 3s ease-in-out infinite;
+            transform-origin: top center;
+            z-index: 4;
+        }
+        
+        @keyframes ribbon {
+            0% {
+                height: 0;
+                opacity: 0;
+            }
+            30% {
+                height: 80px;
+                opacity: 1;
+            }
+            70% {
+                height: 80px;
+                opacity: 1;
+            }
+            100% {
+                height: 0;
+                opacity: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                width: 95%;
+            }
+            
+            .details-item {
+                flex-direction: column;
+            }
+            
+            .details-label, .details-value {
+                width: 100%;
+            }
+            
+            .details-label {
+                margin-bottom: 5px;
+            }
+            
+            .celebration-text {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="celebration-text">Chúc Mừng!</div>
+    
+    <div class="confetti-container" id="confetti-container"></div>
+    
+    <div class="container">
+        <svg class="success-icon" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="11" fill="#4CAF50" />
+            <path d="M8 12l3 3 5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        
+        <h1>Thành Công!</h1>
+        
+        <div class="message">
+            Hành động của bạn đã được thực hiện thành công. Hệ thống đã ghi nhận và xử lý tất cả thông tin bạn đã cung cấp.
+        </div>
+        
+        <div class="details">
+            <h2>Chi tiết thực hiện</h2>
+            <div class="details-item">
+                <div class="details-label">Mã tham chiếu:</div>
+                <div class="details-value">TRX-2025040112845</div>
+            </div>
+            <div class="details-item">
+                <div class="details-label">Thời gian hoàn thành:</div>
+                <div class="details-value">01/04/2025 - 10:28:45</div>
+            </div>
+            <div class="details-item">
+                <div class="details-label">Trạng thái:</div>
+                <div class="details-value" style="color: #4CAF50; font-weight: 600;">Đã hoàn tất</div>
+            </div>
+            <div class="details-item">
+                <div class="details-label">Ghi chú:</div>
+                <div class="details-value">Dữ liệu đã được lưu trữ và sẵn sàng để xem từ bảng điều khiển</div>
+            </div>
+        </div>
+        
+        <a href="/dashboard" class="button">Quay Lại Dashboard</a>
+        <a href="/download-report" class="secondary-action">Tải xuống báo cáo</a>
+        
+        <div class="divider"></div>
+        
+        <div>
+            <p>Bạn có muốn thực hiện hành động tiếp theo không?</p>
+            <a href="/new-action" class="button" style="background-color: #6C757D;">Tạo Yêu Cầu Mới</a>
+        </div>
+        
+        <div class="footer">
+            <p>Nếu bạn gặp bất kỳ vấn đề nào, vui lòng liên hệ <a href="mailto:support@example.com">đội ngũ hỗ trợ</a> của chúng tôi hoặc gọi <a href="tel:+84901234567">0901 234 567</a>.</p>
+            <p>© 2025 Company Name. Tất cả các quyền được bảo lưu.</p>
+        </div>
+    </div>
+
+    <script>
+        // Tạo hiệu ứng confetti
+        document.addEventListener('DOMContentLoaded', function() {
+            const confettiContainer = document.getElementById('confetti-container');
+            const colors = ['#ff0000', '#ff7700', '#ffff00', '#00ff00', '#0000ff', '#8b00ff', '#ff00ff', '#00ffff'];
+            
+            // Tạo confetti
+            for (let i = 0; i < 150; i++) {
+                createConfetti();
+            }
+            
+            // Tạo sparkles xung quanh container
+            for (let i = 0; i < 20; i++) {
+                createSparkle();
+            }
+            
+            // Tạo dải ruy băng
+            for (let i = 0; i < 30; i++) {
+                createRibbon();
+            }
+            
+            function createConfetti() {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                
+                // Random vị trí, kích thước, màu sắc, và hình dạng
+                const size = Math.random() * 10 + 5;
+                const colorIndex = Math.floor(Math.random() * colors.length);
+                const shape = Math.random() < 0.3 ? '50%' : '0%';
+                const leftPos = Math.random() * 100;
+                const delay = Math.random() * 5;
+                const duration = Math.random() * 5 + 5;
+                
+                confetti.style.width = `${size}px`;
+                confetti.style.height = `${size}px`;
+                confetti.style.backgroundColor = colors[colorIndex];
+                confetti.style.borderRadius = shape;
+                confetti.style.left = `${leftPos}%`;
+                confetti.style.top = `-${size}px`;
+                confetti.style.animationDuration = `${duration}s`;
+                confetti.style.animationDelay = `${delay}s`;
+                
+                confettiContainer.appendChild(confetti);
+                
+                // Xóa confetti sau khi animation kết thúc
+                setTimeout(() => {
+                    confetti.remove();
+                }, (delay + duration) * 1000);
+            }
+            
+            function createSparkle() {
+                const sparkle = document.createElement('div');
+                sparkle.classList.add('sparkle');
+                
+                const container = document.querySelector('.container');
+                const containerRect = container.getBoundingClientRect();
+                
+                // Tọa độ ngẫu nhiên xung quanh container
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 20 + Math.random() * 30;
+                const centerX = containerRect.left + containerRect.width / 2;
+                const centerY = containerRect.top + containerRect.height / 2;
+                
+                const x = centerX + Math.cos(angle) * (containerRect.width / 2 + distance);
+                const y = centerY + Math.sin(angle) * (containerRect.height / 2 + distance);
+                
+                sparkle.style.left = `${x}px`;
+                sparkle.style.top = `${y}px`;
+                sparkle.style.animationDelay = `${Math.random() * 2}s`;
+                
+                document.body.appendChild(sparkle);
+                
+                // Tái tạo sparkle sau khi animation kết thúc
+                setTimeout(() => {
+                    sparkle.remove();
+                    createSparkle();
+                }, 2000);
+            }
+            
+            function createRibbon() {
+                const ribbon = document.createElement('div');
+                ribbon.classList.add('ribbon');
+                
+                const leftPos = Math.random() * 100;
+                const delay = Math.random() * 3;
+                const duration = Math.random() * 2 + 2;
+                const colorIndex = Math.floor(Math.random() * colors.length);
+                
+                ribbon.style.left = `${leftPos}%`;
+                ribbon.style.animationDuration = `${duration}s`;
+                ribbon.style.animationDelay = `${delay}s`;
+                ribbon.style.background = `linear-gradient(to bottom, transparent, ${colors[colorIndex]}, transparent)`;
+                ribbon.style.transform = `rotate(${Math.random() * 30 - 15}deg)`;
+                
+                confettiContainer.appendChild(ribbon);
+                
+                // Xóa ribbon sau khi animation kết thúc
+                setTimeout(() => {
+                    ribbon.remove();
+                }, (delay + duration) * 1000);
+            }
+            
+            // Tạo lại confetti sau một khoảng thời gian
+            setTimeout(() => {
+                createMoreConfetti();
+            }, 2000);
+            
+            function createMoreConfetti() {
+                for (let i = 0; i < 50; i++) {
+                    setTimeout(() => {
+                        createConfetti();
+                    }, Math.random() * 3000);
+                }
+                
+                for (let i = 0; i < 10; i++) {
+                    setTimeout(() => {
+                        createRibbon();
+                    }, Math.random() * 3000);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

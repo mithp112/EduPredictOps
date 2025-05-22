@@ -15,28 +15,13 @@
             } else {
                 showLayout2();
             }
-            const option1 = document.getElementById('option1');
-            const option2 = document.getElementById('option2');
-            if (option1.checked === true) {
-                showLayout1();
-            } else {
-                showLayout2();
-            }
+            fetchSchoolList();
         }
     </script>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="left_header">
-                <img class="logo" src="{{ url_for('static', filename='images/logo.png') }}">
-                <div class="footer">    
-                    <div class="footer-text1">UIT</div>
-                    <div class="footer-text2">Dự đoán điểm trung bình lớp 12</div>
-                </div>
-            </div>
-            <div class="right_header">
-                <img class="logo" src="{{ url_for('static', filename='images/logo_12.png') }}">
             <div class="left_header">
                 <img class="logo" src="{{ url_for('static', filename='images/logo.png') }}">
                 <div class="footer">    
@@ -68,6 +53,11 @@
                 <p>Tổng số lần submit: <span id="total-submit">0</span></p>
                 <p>Số lần submit hôm nay: <span id="today-submit">0</span></p>
             </div>
+            <div class="list_school">
+                <select id="schoolListDropdown" onchange="chosenSchool()"></select>
+                <p id="displayedListYear"></p>
+                <p id="displayedListYearInUse"></p>
+            </div>
             <div class="header-content">Dự đoán điểm trung bình lớp 12</div>
             <div class="select-box">
                 <label for="option1">Nhập vào ô</label>
@@ -77,6 +67,7 @@
                 <input type="radio" id="option2" name="layoutOption" onclick="showLayout2()">
             </div>
             <form id="layout1" class="layout" action="predict1" method="POST">
+                <input type="hidden" class="school-name-input" name="schoolName" value="">
                 <div class="subjects">
                     <div class="semester-labels">
                         <span class="label-hk1-lop10">HK1 Lớp 10</span>
@@ -151,7 +142,6 @@
                                 <input type="number" name="GDCD_1_11" min="0" max="10" step="0.1" required/>
                                 <input type="number" name="GDCD_2_11" min="0" max="10" step="0.1" required/>
                             </div>
-                            
                         </div>                       
                     </div> 
                 </div>
@@ -176,6 +166,7 @@
                 </div>
             </form>
             <form id="layout2" class="layout" action="predict_excel1" method="POST" enctype="multipart/form-data">
+                <input type="hidden" class="school-name-input" name="schoolName" value="">
                 <div class="semester">Nhập điểm bằng file Excel</div>
                 <div class="tooltip">
                     (*)
@@ -194,7 +185,6 @@
                 <input type="file" id="excelFile" name="excel_file" accept=".xlsx,.xls">
                 <button type="submit" class="btn-view-results">
                     <div class="btn-view-content"></div>
-                    <span class="btn-view-text">Xem kết quả</span>
                     <span class="btn-view-text">Xem kết quả</span>
                 </button>
             </form>

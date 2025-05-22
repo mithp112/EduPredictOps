@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='Style/main.css') }}" rel="stylesheet" />
+    <title>EduPredictOps | Điểm trung bình 12</title>
+    <script src="{{ url_for('static', filename='Action/script.js') }}"></script>
+    <script>
+        window.onload = async function() {
+            const cachedSchoolList = await fetchSchoolList();
+            fetchSubmitDataFromBackend();
+            const option1 = document.getElementById('option1');
+            const option2 = document.getElementById('option2');
+            if (option1.checked === true) {
+                showLayout1();
+            } else {
+                showLayout2();
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="left_header">
+                <img class="logo" src="{{ url_for('static', filename='images/logo.png') }}">
+                <div class="footer">    
+                    <div class="footer-text1">UIT</div>
+                    <div class="footer-text2">Dự đoán điểm trung bình lớp 12</div>
+                </div>
+            </div>
+            <div class="right_header">
+                <img class="logo" src="{{ url_for('static', filename='images/logo_12.png') }}">
+            </div>
+        </div>
+        <div class="sub-header"></div>
+        <div class="main-content">
+            <select id="schoolListDropdown" onchange="chosenschool()">
+                <option value="">Chọn trường THPT bạn muốn thêm dữ liệu</option>
+                <label id="displayedListYear"></label>
+            </select>
+            <div class="header-content">Lựa chọn loại xữ lí</div>
+            <div class="select-box">
+                <label for="option1">Thêm vào bộ dữ liệu dã có</label>
+                <input type="radio" id="option1" name="layoutOption" onclick="showLayout1()" checked>
+                <label for="option2">Xây dụng bộ dữ liệu mới cho trường THPT khác</label>
+                <input type="radio" id="option2" name="layoutOption" onclick="showLayout2()">
+            </div>
+            <form id="layout1" class="layout" action="add_data" method="POST" enctype="multipart/form-data" checked>
+                <div class="semester">Nhập Dữ liệu cho trường đã có</div>
+                <label for="start_year">Nhập tên trường</label>
+                <input type="string" id="school_name" name="school_name" required>
+                <label for="start_year">Thêm dữ liệu cho năm:</label>
+                <input type="number" id="year" name="start_year" required>
+                <label for="excelFile">Excel Input 10 HKI:</label>
+                <input type="file" id="excelFile" name="excel_file_10_HKI" accept=".xlsx,.xls">
+                <label for="excelFile">Excel Input 10 HKII:</label>
+                <input type="file" id="excelFile" name="excel_file_10_HKII" accept=".xlsx,.xls">
+                <label for="excelFile">Excel Input 11 HKI:</label>
+                <input type="file" id="excelFile" name="excel_file_11_HKI" accept=".xlsx,.xls">
+                <label for="excelFile">Excel Input 11 HKII:</label>
+                <input type="file" id="excelFile" name="excel_file_11_HKII" accept=".xlsx,.xls">
+                <label for="excelFile">Excel Input 12 HKI:</label>
+                <input type="file" id="excelFile" name="excel_file_12_HKI" accept=".xlsx,.xls">
+                <label for="excelFile">Excel Input 12 HKII:</label>
+                <input type="file" id="excelFile" name="excel_file_12_HKII" accept=".xlsx,.xls">
+                <label for="excelFile">Excel Input Graduate:</label>
+                <input type="file" id="excelFile" name="excel_file_graduate" accept=".xlsx,.xls">
+                <button type="submit" class="btn-view-results">
+                    <div class="btn-view-content"></div>
+                    <span class="btn-view-text">Start</span>
+                </button>
+            </form>
+            <form id="layout2" class="layout" action="add_new_data" method="POST" enctype="multipart/form-data">
+                <div class="semester">Xử lí bộ dữ liệu mới</div>
+                <label for="start_year">Nhập tên trường</label>
+                <input type="string" id="school_name" name="school_name" required>
+                <label for="start_year">Năm bắt đầu:</label>
+                <input type="number" id="start_year" name="start_year" required>
+                <label for="end_year">Năm kết thúc:</label>
+                <input type="number" id="end_year" name="end_year" required>
+                <button type="button" class="btn-view-results" onclick="generateUploadFields()">Tiến hành tải lên các file</button>
+                <div id="upload_fields_container"></div>
+                <button type="submit" class="btn-view-results">
+                    <div class="btn-view-content"></div>
+                    <span class="btn-view-text">Tiến hành tải lên các file</span>
+                </button>
+            </form>
+        </div>
+    </div> 
+</body>
+</html>

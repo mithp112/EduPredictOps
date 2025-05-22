@@ -15,12 +15,20 @@ function redirectToPage6() {
     window.location.href = "page6"; // Chuyển đến page6
 }
 
+function redirectToPageAuto() {
+    window.location.href = "page_auto"; // Chuyển đến page6
+}
+
 function redirectToPageDashBoard() {
     window.location.href = "page_dashboard"; // Chuyển đến page dashboard
 }
 
 function redirectToPageAdmin() {
     window.location.href = "page_admin"; // Chuyển đến pageadmin
+}
+
+function redirectToPageProcessing() {
+    window.location.href = "page_processing_data"; // Chuyển đến page processing
 }
 
 document.addEventListener('keydown', function (event) {
@@ -224,6 +232,57 @@ function fetchPerformanceSingle() {
     });
 }
 
+
+async function fetchSchoolList() {
+    try {
+        const response = await fetch("/get_all_schools_and_years");
+        if (!response.ok) throw new Error("Không thể lấy danh sách trường.");
+
+        const schoolList = await response.json();
+        const dropdown = document.getElementById("schoolListDropdown");
+
+        // Xóa các lựa chọn cũ
+        dropdown.innerHTML = `<option value="">Danh sách các trường hiện tại</option>`;        
+
+        schoolList.forEach((school) => {
+            const option = document.createElement("option");
+            option.value = school.schoolName;
+            option.textContent = school.schoolName;
+            dropdown.appendChild(option);
+        });
+        return schoolList
+
+    } catch (error) {
+        console.error("Lỗi khi tải danh sách trường:", error);
+        return []
+    }
+}
+
+
+function chosenSchool() {
+    const dropdown = document.getElementById("schoolListDropdown");
+    const selectedValue = dropdown.value;
+    const yearDisplay = document.getElementById("displayedListYear");
+    const yearInUseDisplay = document.getElementById("displayedListYearInUse");
+    const hiddenSchoolInputs = document.querySelectorAll('input[name="schoolName"][type="hidden"]');
+    hiddenSchoolInputs.forEach(input => {
+        input.value = schoolName;
+    });
+    if (!selectedValue) {
+        yearDisplay.innerText = "";
+        yearInUseDisplay.innerText = "";
+        return;
+    }
+
+    const selectedSchool = cachedSchoolList.find(school => school.schoolName === selectedValue);
+    if (selectedSchool && selectedSchool.years) {
+        yearDisplay.innerText = "Các năm có sẵn: " + selectedSchool.years.join(", ");
+        yearInUseDisplay.innerText = "Các năm được train: " + selectedSchool.years_in_use.join(", ");
+    } else {
+        yearDisplay.innerText = "Không có thông tin năm học.";
+    }
+}
+
 function toggleDropdown(event) {
     const dropdown = document.getElementById('admin-dropdown');
     dropdown.classList.toggle('hidden');
@@ -240,4 +299,49 @@ document.addEventListener('click', function (e) {
 
 
 
-  
+function generateUploadFields() {
+    const startYear = parseInt(document.getElementById("start_year").value);
+    const endYear = parseInt(document.getElementById("end_year").value);
+    const container = document.getElementById("upload_fields_container");
+    container.innerHTML = ""; // Xóa cũ nếu có
+
+    if (isNaN(startYear) || isNaN(endYear) || startYear > endYear) {
+        alert("Vui lòng nhập năm hợp lệ!");
+        return;
+    }
+    const semesters = ["HK1", "HK2"];
+    const grades = [10, 11, 12];
+
+    for (let year = startYear; year <= endYear; year++) {
+        grades.forEach(grade => {
+            semesters.forEach(sem => {
+                const label = document.createElement("label");
+                label.textContent = `Dữ liệu điểm năm ${year} - Khối ${grade} - ${sem}`;
+                const input = document.createElement("input");
+                input.type = "file";
+                input.name = `file_${year}_${grade}_${sem}`;
+                input.required = true;
+                container.appendChild(label);
+                container.appendChild(input);
+                container.appendChild(document.createElement("br"));
+            });
+        });
+
+        // Nếu đủ 3 năm học, thì hiển thị file tốt nghiệp
+        if (year >= startYear + 2) {
+            const label = document.createElement("label");
+            label.textContent = `Dữ liệu điểm TN năm ${year}`;
+            const input = document.createElement("input");
+            input.type = "file";
+            input.name = `file_${year}_graduate`;
+            input.required = true;
+            container.appendChild(label);
+            container.appendChild(input);
+            container.appendChild(document.createElement("br"));
+        }
+    }
+}
+
+
+
+// function generateCheckDriftFields

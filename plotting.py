@@ -6,6 +6,7 @@ from sklearn.metrics import mean_absolute_percentage_error
 import matplotlib.gridspec as gridspec
 import matplotlib
 matplotlib.use('Agg')
+from pathlib import Path
 
 
 
@@ -517,87 +518,72 @@ def plot_relationship_input_output(type, file_path):
 
 
 
-def update_chart_10_11_12():
-    # Vẽ biểu đồ phổ điểm
-    plot_subjects_point_spectrum('LR','E:/Download/ScorePredict + MLOps/data/LR_Actual_Pred_10_11_12.xlsx', subjects_10_11_12)
-    plot_subjects_point_spectrum('MLP','E:/Download/ScorePredict + MLOps/data/MLP_Actual_Pred_10_11_12.xlsx', subjects_10_11_12)
-    plot_subjects_point_spectrum('LSTM','E:/Download/ScorePredict + MLOps/data/LSTM_Actual_Pred_10_11_12.xlsx', subjects_10_11_12)
+def update_chart_10_11_12(school_name):
+    base_path = Path("Data") / school_name
+    file_prefix = '10_11_12'
+
+    plot_subjects_point_spectrum('LR', base_path / f'LR_Actual_Pred_{file_prefix}.xlsx', subjects_10_11_12)
+    plot_subjects_point_spectrum('MLP', base_path / f'MLP_Actual_Pred_{file_prefix}.xlsx', subjects_10_11_12)
+    plot_subjects_point_spectrum('LSTM', base_path / f'LSTM_Actual_Pred_{file_prefix}.xlsx', subjects_10_11_12)
+
+    plot_individual_model_accuracy('LR', base_path / f'LR_Actual_Pred_{file_prefix}.xlsx', subjects_10_11_12)
+    plot_individual_model_accuracy('MLP', base_path / f'MLP_Actual_Pred_{file_prefix}.xlsx', subjects_10_11_12)
+    plot_individual_model_accuracy('LSTM', base_path / f'LSTM_Actual_Pred_{file_prefix}.xlsx', subjects_10_11_12)
+
+    plot_individual_model_accuracy_comparison(
+        file_prefix,
+        base_path / f'LR_Actual_Pred_{file_prefix}.xlsx',
+        base_path / f'MLP_Actual_Pred_{file_prefix}.xlsx',
+        base_path / f'LSTM_Actual_Pred_{file_prefix}.xlsx',
+        subjects_10_11_12
+    )
+
+    plot_grade_distribution_pie(school_name, base_path / f'{file_prefix}.xlsx')
+    plot_score_distribution_pie(school_name, base_path / f'{file_prefix}.xlsx')
+    plot_calculate_correlations(school_name, base_path / f'{file_prefix}.xlsx')
 
 
-    # Vẽ biểu đồ thể hiện độ chính xác
-    plot_individual_model_accuracy('LR','E:/Download/ScorePredict + MLOps/data/LR_Actual_Pred_10_11_12.xlsx', subjects_10_11_12)
-    plot_individual_model_accuracy('MLP','E:/Download/ScorePredict + MLOps/data/MLP_Actual_Pred_10_11_12.xlsx', subjects_10_11_12)
-    plot_individual_model_accuracy('LSTM','E:/Download/ScorePredict + MLOps/data/LSTM_Actual_Pred_10_11_12.xlsx', subjects_10_11_12)
+def update_chart_TN_TN(school_name):
+    base_path = Path("Data") / school_name
+    file_prefix = 'TN_TN'
+
+    plot_subjects_point_spectrum('LR_TN', base_path / f'LR_Actual_Pred_{file_prefix}.xlsx', subjects_TN)
+    plot_subjects_point_spectrum('MLP_TN', base_path / f'MLP_Actual_Pred_{file_prefix}.xlsx', subjects_TN)
+    plot_subjects_point_spectrum('LSTM_TN', base_path / f'LSTM_Actual_Pred_{file_prefix}.xlsx', subjects_TN)
+
+    plot_individual_model_accuracy('LR_TN', base_path / f'LR_Actual_Pred_{file_prefix}.xlsx', subjects_TN)
+    plot_individual_model_accuracy('MLP_TN', base_path / f'MLP_Actual_Pred_{file_prefix}.xlsx', subjects_TN)
+    plot_individual_model_accuracy('LSTM_TN', base_path / f'LSTM_Actual_Pred_{file_prefix}.xlsx', subjects_TN)
+
+    plot_individual_model_accuracy_comparison(
+        file_prefix,
+        base_path / f'LR_Actual_Pred_{file_prefix}.xlsx',
+        base_path / f'MLP_Actual_Pred_{file_prefix}.xlsx',
+        base_path / f'LSTM_Actual_Pred_{file_prefix}.xlsx',
+        subjects_TN
+    )
+
+    plot_grade_distribution_pie(school_name, base_path / f'{file_prefix}.xlsx')
+    plot_score_distribution_pie(school_name, base_path / f'{file_prefix}.xlsx')
+    plot_calculate_correlations(school_name, base_path / f'{file_prefix}.xlsx')
 
 
+def update_chart_TN_XH(school_name):
+    base_path = Path("Data") / school_name
+    file_prefix = 'TN_XH'
 
-    # Vẽ biểu đồ so sánh độ chính xác
-    plot_individual_model_accuracy_comparison('10_11_12', 'E:/Download/ScorePredict + MLOps/data/LR_Actual_Pred_10_11_12.xlsx', 'E:/Download/ScorePredict + MLOps/data/MLP_Actual_Pred_10_11_12.xlsx', 'E:/Download/ScorePredict + MLOps/data/LSTM_Actual_Pred_10_11_12.xlsx', subjects_10_11_12)
+    plot_subjects_point_spectrum('LR_XH', base_path / f'LR_Actual_Pred_{file_prefix}.xlsx', subjects_XH)
+    plot_subjects_point_spectrum('MLP_XH', base_path / f'MLP_Actual_Pred_{file_prefix}.xlsx', subjects_XH)
+    plot_subjects_point_spectrum('LSTM_XH', base_path / f'LSTM_Actual_Pred_{file_prefix}.xlsx', subjects_XH)
 
+    plot_individual_model_accuracy('LR_XH', base_path / f'LR_Actual_Pred_{file_prefix}.xlsx', subjects_XH)
+    plot_individual_model_accuracy('MLP_XH', base_path / f'MLP_Actual_Pred_{file_prefix}.xlsx', subjects_XH)
+    plot_individual_model_accuracy('LSTM_XH', base_path / f'LSTM_Actual_Pred_{file_prefix}.xlsx', subjects_XH)
 
-    # Vẽ biểu đồ tròn phân bố học lực
-    plot_grade_distribution_pie('10_11_12', 'E:/Download/ScorePredict + MLOps/data/10_11_12.xlsx')
-
-
-    # Vẽ biểu đồ tròn phân bố điểm trung bình
-    plot_score_distribution_pie('10_11_12', 'E:/Download/ScorePredict + MLOps/data/10_11_12.xlsx')
-
-    # Vẽ ma trận tương quan
-    plot_calculate_correlations('10_11_12', 'E:/Download/ScorePredict + MLOps/data/10_11_12.xlsx')
-
-
-def update_chart_TN_TN():
-    # Vẽ biểu đồ phổ điểm
-    plot_subjects_point_spectrum('LR_TN','E:/Download/ScorePredict + MLOps/data/LR_Actual_Pred_TN_TN.xlsx', subjects_TN)
-    plot_subjects_point_spectrum('MLP_TN','E:/Download/ScorePredict + MLOps/data/MLP_Actual_Pred_TN_TN.xlsx', subjects_TN)
-    plot_subjects_point_spectrum('LSTM_TN','E:/Download/ScorePredict + MLOps/data/LSTM_Actual_Pred_TN_TN.xlsx', subjects_TN)
-
-    # Vẽ biểu đồ thể hiện độ chính xác
-    plot_individual_model_accuracy('LR_TN','E:/Download/ScorePredict + MLOps/data/LR_Actual_Pred_TN_TN.xlsx', subjects_TN)
-    plot_individual_model_accuracy('MLP_TN','E:/Download/ScorePredict + MLOps/data/MLP_Actual_Pred_TN_TN.xlsx', subjects_TN)
-    plot_individual_model_accuracy('LSTM_TN','E:/Download/ScorePredict + MLOps/data/LSTM_Actual_Pred_TN_TN.xlsx', subjects_TN)
-
-
-    # Vẽ biểu đồ so sánh độ chính xác
-    plot_individual_model_accuracy_comparison('TN_TN', 'E:/Download/ScorePredict + MLOps/data/LR_Actual_Pred_TN_TN.xlsx', 'E:/Download/ScorePredict + MLOps/data/MLP_Actual_Pred_TN_TN.xlsx', 'E:/Download/ScorePredict + MLOps/data/LSTM_Actual_Pred_TN_TN.xlsx', subjects_TN)
-
-    # Vẽ biểu đồ tròn phân bố học lực
-    plot_grade_distribution_pie('TN_TN', 'E:/Download/ScorePredict + MLOps/data/TN_TN.xlsx')
-
-
-    # Vẽ biểu đồ tròn phân bố điểm trung bình
-    plot_score_distribution_pie('TN_TN', 'E:/Download/ScorePredict + MLOps/data/TN_TN.xlsx')
-
-    # Vẽ ma trận tương quan
-    plot_calculate_correlations('TN_TN', 'E:/Download/ScorePredict + MLOps/data/TN_TN.xlsx')
-
-
-
-def update_chart_TN_XH():
-    # Vẽ biểu đồ phổ điểm
-    plot_subjects_point_spectrum('LR_XH','E:/Download/ScorePredict + MLOps/data/LR_Actual_Pred_TN_XH.xlsx', subjects_XH)
-    plot_subjects_point_spectrum('MLP_XH','E:/Download/ScorePredict + MLOps/data/MLP_Actual_Pred_TN_XH.xlsx', subjects_XH)
-    plot_subjects_point_spectrum('LSTM_XH','E:/Download/ScorePredict + MLOps/data/LSTM_Actual_Pred_TN_XH.xlsx', subjects_XH)
-
-
-    # Vẽ biểu đồ thể hiện độ chính xác
-    plot_individual_model_accuracy('LR_XH','E:/Download/ScorePredict + MLOps/data/LR_Actual_Pred_TN_XH.xlsx', subjects_XH)
-    plot_individual_model_accuracy('MLP_XH','E:/Download/ScorePredict + MLOps/data/MLP_Actual_Pred_TN_XH.xlsx', subjects_XH)
-    plot_individual_model_accuracy('LSTM_XH','E:/Download/ScorePredict + MLOps/data/LSTM_Actual_Pred_TN_XH.xlsx', subjects_XH)
-
-
-
-    # Vẽ biểu đồ so sánh độ chính xác
-    plot_individual_model_accuracy_comparison('TN_XH', 'E:/Download/ScorePredict + MLOps/data/LR_Actual_Pred_TN_XH.xlsx', 'E:/Download/ScorePredict + MLOps/data/MLP_Actual_Pred_TN_XH.xlsx', 'E:/Download/ScorePredict + MLOps/data/LSTM_Actual_Pred_TN_XH.xlsx', subjects_XH)
-
-
-
-    # Vẽ biểu đồ tròn phân bố học lực
-    plot_grade_distribution_pie('TN_XH', 'E:/Download/ScorePredict + MLOps/data/TN_XH.xlsx')
-
-
-    # Vẽ biểu đồ tròn phân bố điểm trung bình
-    plot_score_distribution_pie('TN_XH', 'E:/Download/ScorePredict + MLOps/data/TN_XH.xlsx')
-
-    # Vẽ ma trận tương quan
-    plot_calculate_correlations('TN_XH', 'E:/Download/ScorePredict + MLOps/data/TN_XH.xlsx')
+    plot_individual_model_accuracy_comparison(
+        file_prefix,
+        base_path / f'LR_Actual_Pred_{file_prefix}.xlsx',
+        base_path / f'MLP_Actual_Pred_{file_prefix}.xlsx',
+        base_path / f'LSTM_Actual_Pred_{file_prefix}.xlsx',
+        subjects_XH
+    )

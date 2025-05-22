@@ -6,7 +6,6 @@
     <title>EduPredictOps | Điểm thi tốt nghiệp</title>
     <script src="{{ url_for('static', filename='Action/script.js') }}"></script>
     <script>
-        // Khi trang tải, gọi hàm lấy dữ liệu
         window.onload = function() {
             fetchSubmitDataFromBackend();
             const option1 = document.getElementById('option1');
@@ -16,13 +15,7 @@
             } else {
                 showLayout2();
             }
-            const option1 = document.getElementById('option1');
-            const option2 = document.getElementById('option2');
-            if (option1.checked === true) {
-                showLayout1();
-            } else {
-                showLayout2();
-            }
+            fetchSchoolList();
         }
     </script>
 </head>
@@ -38,27 +31,18 @@
             </div>
             <div class="right_header">
                 <img class="logo" src="{{ url_for('static', filename='images/logo_TN.png') }}">
-            <div class="left_header">
-                <img class="logo" src="{{ url_for('static', filename='images/logo.png') }}">
-                <div class="footer">    
-                    <div class="footer-text1">UIT</div>
-                    <div class="footer-text2">Dự đoán kết quả thi THPT</div>
-                </div>
-            </div>
-            <div class="right_header">
-                <img class="logo" src="{{ url_for('static', filename='images/logo_TN.png') }}">
             </div>
         </div>
         <div class="sub-header"></div>
         <div class="main-content">
             <div class="button-header">
-                <button class="btn-hoc12-1" onclick="redirectToPage1()">
+                <button class="btn-hoc12" onclick="redirectToPage1()">
                     <div class="btn-content">
                         <div class="btn-icon"></div>
                         <span class="btn-text">Điểm trung bình 12</span>
                     </div>
                 </button>
-                <button class="btn-hoc11-1">
+                <button class="btn-hoc11">
                     <div class="btn-content">
                         <div class="btn-icon"></div>
                         <span class="btn-text">Điểm thi Tốt Nghiệp</span>
@@ -69,6 +53,11 @@
                 <p>Tổng số lần submit: <span id="total-submit">0</span></p>
                 <p>Số lần submit hôm nay: <span id="today-submit">0</span></p>
             </div>
+            <div class="list_school">
+                <select id="schoolListDropdown" onchange="chosenSchool()"></select>
+                <p id="displayedListYear"></p>
+                <p id="displayedListYearInUse"></p>
+            </div>
             <div class="header-content">Dự đoán điểm thi THPT</div>
             <div class="select-box">
                 <label for="option1">Nhập vào ô</label>
@@ -77,6 +66,7 @@
                 <input type="radio" id="option2" name="layoutOption" onclick="showLayout2()">
             </div>
             <form id="layout1" class="layout" action="predict2" method="POST">
+                <input type="hidden" class="school-name-input" name="schoolName" value="">
                 <div class="subjects">
                     <div class="semester-labels">
                         <span class="label-hk1-lop10">HK1 Lớp 10</span>
@@ -174,29 +164,19 @@
                         </div>
                     </div>
                 </div>
-                <div>
-                    <div class="tooltip">
-                        (*)
-                        <span class="tooltiptext">Mặc định là Xã hội nếu không chọn.
-                        </span>
-                        <span class="additional-info-label">Ban thi của nhóm Học sinh</span>
-                    </div>
-                <div>
-                    <div class="tooltip">
-                        (*)
-                        <span class="tooltiptext">Mặc định là Xã hội nếu không chọn.
-                        </span>
-                        <span class="additional-info-label">Ban thi của nhóm Học sinh</span>
-                    </div>
+                <div class="tooltip">
+                    (*)
+                    <span class="tooltiptext">Mặc định là Xã hội nếu không chọn.</span>
+                    <span class="additional-info-label">Ban thi của nhóm Học sinh</span>
                 </div>
                 <div class="additional-info">
                     <div class="nature">
                         <input type="checkbox" id="nature_checkbox" name="nature" onclick="toggleCheckbox('nature')">
-                        <label for="nature_checkbox">Tự nhiên </label>
+                        <label for="nature_checkbox">Tự nhiên</label>
                     </div>
                     <div class="social">
                         <input type="checkbox" id="social_checkbox" name="social" onclick="toggleCheckbox('social')">
-                        <label for="social-checkbox">Xã hội</label>
+                        <label for="social_checkbox">Xã hội</label>
                     </div>
                 </div>                  
                 <div class="additional-info-label">
@@ -220,22 +200,20 @@
                 </div>
             </form>
             <form id="layout2" class="layout" action="predict_excel2" method="POST" enctype="multipart/form-data">
-                <div>
-                    <div class="tooltip">
-                        (*)
-                        <span class="tooltiptext">Mặc định là Xã hội nếu không chọn.
-                        </span>
-                        <span class="additional-info-label">Ban thi của nhóm Học sinh</span>
-                    </div>
+                <input type="hidden" class="school-name-input" name="schoolName" value="">
+                <div class="tooltip">
+                    (*)
+                    <span class="tooltiptext">Mặc định là Xã hội nếu không chọn.</span>
+                    <span class="additional-info-label">Ban thi của nhóm Học sinh</span>
                 </div>
                 <div class="additional-info">
                     <div class="nature">
                         <input type="checkbox" id="nature_checkbox1" name="nature" onclick="toggleCheckbox1('nature')">
-                        <label for="nature_checkbox">Tự nhiên </label>
+                        <label for="nature_checkbox1">Tự nhiên</label>
                     </div>
                     <div class="social">
                         <input type="checkbox" id="social_checkbox1" name="social" onclick="toggleCheckbox1('social')">
-                        <label for="social-checkbox">Xã hội</label>
+                        <label for="social_checkbox1">Xã hội</label>
                     </div>
                 </div>   
                 <div class="semester">Nhập điểm bằng file Excel</div>
@@ -257,12 +235,9 @@
                 <button type="submit" class="btn-view-results">
                     <div class="btn-view-content"></div>
                     <span class="btn-view-text">Xem kết quả</span>
-                    <span class="btn-view-text">Xem kết quả</span>
                 </button>
             </form>
         </div>
     </div>
 </body>
 </html>
-
-

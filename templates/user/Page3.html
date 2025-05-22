@@ -38,15 +38,6 @@
             </div>
             <div class="right_header">
                 <img class="logo" src="{{ url_for('static', filename='images/logo_12.png') }}">
-            <div class="left_header">
-                <img class="logo" src="{{ url_for('static', filename='images/logo.png') }}">
-                <div class="footer">    
-                    <div class="footer-text1">UIT</div>
-                    <div class="footer-text2">Dự đoán điểm trung bình lớp 12</div>
-                </div>
-            </div>
-            <div class="right_header">
-                <img class="logo" src="{{ url_for('static', filename='images/logo_12.png') }}">
             </div>
         </div>
         <div class="sub-header"></div>
@@ -72,7 +63,6 @@
             <div class="header-content">Kết quả dự đoán điểm trung bình lớp 12</div>
             {% if names %}
             <div class="navigation">
-                <!-- Nếu dự đoán bằng Excel thì sẽ có giá trị names được trả về -> hiển thị phần chuyển kết quả và download -->
                 <form id="downloadForm" action="download_excel1" method="post">
                     <button id="prevBtn" type="button" onclick="prevResult1()">&laquo; Previous</button>
                     <div id="outputIndex"> 0 </div>
@@ -132,8 +122,8 @@
                         <div id="model1Biology2" class="output-biology">{{ kq_Model1['Sinh_2'][0] }}</div>
                         <div id="model1History2" class="output-history">{{ kq_Model1['Sử_2'][0] }}</div>
                         <div id="model1Geography2" class="output-geography">{{ kq_Model1['Địa_2'][0] }}</div>
-                        <div id="model1English2" class="output-english">{{ kq_Model1['Anh_2'][0] }}</div>
-                        <div id="model1Civic2" class="output-civic">{{ kq_Model1['GDCD_2'][0] }}</div>
+                        <div id="model1English2" class="output-english">{{ kq_Model1['GDCD_2'][0] }}</div>
+                        <div id="model1Civic2" class="output-civic">{{ kq_Model1['Anh_2'][0] }}</div>
                     </div>
                 </div>
                 <div class="model2">
@@ -181,8 +171,8 @@
                         <div id="model2Biology2" class="output-biology">{{ kq_Model2['Sinh_2'][0] }}</div>
                         <div id="model2History2" class="output-history">{{ kq_Model2['Sử_2'][0] }}</div>
                         <div id="model2Geography2" class="output-geography">{{ kq_Model2['Địa_2'][0] }}</div>
-                        <div id="model2English2" class="output-english">{{ kq_Model2['Anh_2'][0] }}</div>
-                        <div id="model2Civic2" class="output-civic">{{ kq_Model2['GDCD_2'][0] }}</div>
+                        <div id="model2English2" class="output-english">{{ kq_Model2['GDCD_2'][0] }}</div>
+                        <div id="model2Civic2" class="output-civic">{{ kq_Model2['Anh_2'][0] }}</div>
                     </div>
                 </div>
                 <div class="model3">
@@ -230,13 +220,11 @@
                         <div id="model3Biology2" class="output-biology">{{ kq_Model3['Sinh_2'][0] }}</div>
                         <div id="model3History2" class="output-history">{{ kq_Model3['Sử_2'][0] }}</div>
                         <div id="model3Geography2" class="output-geography">{{ kq_Model3['Địa_2'][0] }}</div>
-                        <div id="model3English2" class="output-english">{{ kq_Model3['Anh_2'][0] }}</div>
-                        <div id="model3Civic2" class="output-civic">{{ kq_Model3['GDCD_2'][0] }}</div>
+                        <div id="model3English2" class="output-english">{{ kq_Model3['GDCD_2'][0] }}</div>
+                        <div id="model3Civic2" class="output-civic">{{ kq_Model3['Anh_2'][0] }}</div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div>
         </div>
         <div>
             <button class="btn-view-results" onclick="redirectToPage5()">
@@ -257,172 +245,142 @@
             </button>
         </div>
     </div>
+
+    {% if names %}
+    <script>
+        let index = 0; // Biến lưu chỉ số hiện tại
+
+        const names = {{ names|tojson|safe }};
+        const kq_Model1 = {{ kq_Model1|tojson|safe }};
+        const kq_Model2 = {{ kq_Model2|tojson|safe }};
+        const kq_Model3 = {{ kq_Model3|tojson|safe }};
+        
+        // Hàm để cập nhật tất cả các giá trị hiển thị dựa trên currentIndex
+        function updateModelDisplay1() {
+            // Cập nhật giá trị cho tên
+            document.getElementById('outputName').textContent = names[index];
+            document.getElementById('outputIndex').textContent = index;
+
+            // Cập nhật giá trị cho Model 1
+            document.getElementById('model1Math1').textContent = kq_Model1['Toán_1'][index];
+            document.getElementById('model1Literature1').textContent = kq_Model1['Văn_1'][index];
+            document.getElementById('model1Physics1').textContent = kq_Model1['Lý_1'][index];
+            document.getElementById('model1Chemistry1').textContent = kq_Model1['Hóa_1'][index];
+            document.getElementById('model1Biology1').textContent = kq_Model1['Sinh_1'][index];
+            document.getElementById('model1History1').textContent = kq_Model1['Sử_1'][index];
+            document.getElementById('model1Geography1').textContent = kq_Model1['Địa_1'][index];
+            document.getElementById('model1English1').textContent = kq_Model1['Anh_1'][index];
+            document.getElementById('model1Civic1').textContent = kq_Model1['GDCD_1'][index];
+
+            document.getElementById('model1Math2').textContent = kq_Model1['Toán_2'][index];
+            document.getElementById('model1Literature2').textContent = kq_Model1['Văn_2'][index];
+            document.getElementById('model1Physics2').textContent = kq_Model1['Lý_2'][index];
+            document.getElementById('model1Chemistry2').textContent = kq_Model1['Hóa_2'][index];
+            document.getElementById('model1Biology2').textContent = kq_Model1['Sinh_2'][index];
+            document.getElementById('model1History2').textContent = kq_Model1['Sử_2'][index];
+            document.getElementById('model1Geography2').textContent = kq_Model1['Địa_2'][index];
+            document.getElementById('model1English2').textContent = kq_Model1['GDCD_2'][index];
+            document.getElementById('model1Civic2').textContent = kq_Model1['Anh_2'][index];
+
+            // Cập nhật giá trị cho Model 2
+            document.getElementById('model2Math1').textContent = kq_Model2['Toán_1'][index];
+            document.getElementById('model2Literature1').textContent = kq_Model2['Văn_1'][index];
+            document.getElementById('model2Physics1').textContent = kq_Model2['Lý_1'][index];
+            document.getElementById('model2Chemistry1').textContent = kq_Model2['Hóa_1'][index];
+            document.getElementById('model2Biology1').textContent = kq_Model2['Sinh_1'][index];
+            document.getElementById('model2History1').textContent = kq_Model2['Sử_1'][index];
+            document.getElementById('model2Geography1').textContent = kq_Model2['Địa_1'][index];
+            document.getElementById('model2English1').textContent = kq_Model2['Anh_1'][index];
+            document.getElementById('model2Civic1').textContent = kq_Model2['GDCD_1'][index];
+
+            document.getElementById('model2Math2').textContent = kq_Model2['Toán_2'][index];
+            document.getElementById('model2Literature2').textContent = kq_Model2['Văn_2'][index];
+            document.getElementById('model2Physics2').textContent = kq_Model2['Lý_2'][index];
+            document.getElementById('model2Chemistry2').textContent = kq_Model2['Hóa_2'][index];
+            document.getElementById('model2Biology2').textContent = kq_Model2['Sinh_2'][index];
+            document.getElementById('model2History2').textContent = kq_Model2['Sử_2'][index];
+            document.getElementById('model2Geography2').textContent = kq_Model2['Địa_2'][index];
+            document.getElementById('model2English2').textContent = kq_Model2['GDCD_2'][index];
+            document.getElementById('model2Civic2').textContent = kq_Model2['Anh_2'][index];
+
+            // Cập nhật giá trị cho Model 3
+            document.getElementById('model3Math1').textContent = kq_Model3['Toán_1'][index];
+            document.getElementById('model3Literature1').textContent = kq_Model3['Văn_1'][index];
+            document.getElementById('model3Physics1').textContent = kq_Model3['Lý_1'][index];
+            document.getElementById('model3Chemistry1').textContent = kq_Model3['Hóa_1'][index];
+            document.getElementById('model3Biology1').textContent = kq_Model3['Sinh_1'][index];
+            document.getElementById('model3History1').textContent = kq_Model3['Sử_1'][index];
+            document.getElementById('model3Geography1').textContent = kq_Model3['Địa_1'][index];
+            document.getElementById('model3English1').textContent = kq_Model3['Anh_1'][index];
+            document.getElementById('model3Civic1').textContent = kq_Model3['GDCD_1'][index];
+
+            document.getElementById('model3Math2').textContent = kq_Model3['Toán_2'][index];
+            document.getElementById('model3Literature2').textContent = kq_Model3['Văn_2'][index];
+            document.getElementById('model3Physics2').textContent = kq_Model3['Lý_2'][index];
+            document.getElementById('model3Chemistry2').textContent = kq_Model3['Hóa_2'][index];
+            document.getElementById('model3Biology2').textContent = kq_Model3['Sinh_2'][index];
+            document.getElementById('model3History2').textContent = kq_Model3['Sử_2'][index];
+            document.getElementById('model3Geography2').textContent = kq_Model3['Địa_2'][index];
+            document.getElementById('model3English2').textContent = kq_Model3['GDCD_2'][index];
+            document.getElementById('model3Civic2').textContent = kq_Model3['Anh_2'][index];
+        }
+
+        // Hàm để chuyển sang dữ liệu trước đó
+        function prevResult1() {
+            console.log(index);
+            if (index > 0) {
+                index--;
+            }
+            else{
+                index = names.length -1;
+            }
+            updateModelDisplay1();
+        }
+
+        // Hàm để chuyển sang dữ liệu tiếp theo
+        function nextResult1() {
+            console.log(index);
+            if (index < names.length - 1) {
+                index++;
+            }
+            else{
+                index = 0
+            }
+            updateModelDisplay1();
+        }
+
+        // Cập nhật khi trang load lần đầu
+        document.addEventListener('DOMContentLoaded', updateModelDisplay1);
+    </script>
+    {% endif %}
+
+    <script>
+        function fireworkEffect() {
+            const container = document.querySelector('.firework-container');
+            
+            for (let i = 0; i < 30; i++) {
+                const firework = document.createElement('div');
+                firework.className = 'firework';
+                firework.style.width = firework.style.height = Math.random() * 30 + 10 + 'px';
+                firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                firework.style.left = Math.random() * 100 + 'vw';
+                firework.style.top = Math.random() * 100 + 'vh';
+                firework.style.animationDelay = Math.random() * 1 + 's';
+                
+                // Thêm pháo hoa vào container
+                container.appendChild(firework);
+
+                // Xóa pháo hoa sau khi hiệu ứng kết thúc
+                firework.addEventListener('animationend', () => firework.remove());
+            }
+        }
+
+        // Tự động chạy hiệu ứng khi trang load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                fireworkEffect();
+            }, 300); // Đợi 0.3s sau khi load trang rồi mới chạy hiệu ứng
+        });
+    </script>
 </body>
 </html>
-
-
-{% if names %}
-<script>
-    let index = 0; // Biến lưu chỉ số hiện tại
-
-    const names = {{ names|tojson|safe }};
-    const kq_Model1 = {{ kq_Model1|tojson|safe }};
-    const kq_Model2 = {{ kq_Model2|tojson|safe }};
-    const kq_Model3 = {{ kq_Model3|tojson|safe }};
-    
-    // Hàm để cập nhật tất cả các giá trị hiển thị dựa trên currentIndex
-    function updateModelDisplay1() {
-        // Cập nhật giá trị cho tên
-        document.getElementById('outputName').textContent = names[index];
-        document.getElementById('outputIndex').textContent = index;
-
-        // Cập nhật giá trị cho Model 1
-        document.getElementById('model1Math1').textContent = kq_Model1['Toán_1'][index];
-        document.getElementById('model1Literature1').textContent = kq_Model1['Văn_1'][index];
-        document.getElementById('model1Physics1').textContent = kq_Model1['Lý_1'][index];
-        document.getElementById('model1Chemistry1').textContent = kq_Model1['Hóa_1'][index];
-        document.getElementById('model1Biology1').textContent = kq_Model1['Sinh_1'][index];
-        document.getElementById('model1History1').textContent = kq_Model1['Sử_1'][index];
-        document.getElementById('model1Geography1').textContent = kq_Model1['Địa_1'][index];
-        document.getElementById('model1English1').textContent = kq_Model1['GDCD_1'][index];
-        document.getElementById('model1Civic1').textContent = kq_Model1['Anh_1'][index];
-
-        document.getElementById('model1Math2').textContent = kq_Model1['Toán_2'][index];
-        document.getElementById('model1Literature2').textContent = kq_Model1['Văn_2'][index];
-        document.getElementById('model1Physics2').textContent = kq_Model1['Lý_2'][index];
-        document.getElementById('model1Chemistry2').textContent = kq_Model1['Hóa_2'][index];
-        document.getElementById('model1Biology2').textContent = kq_Model1['Sinh_2'][index];
-        document.getElementById('model1History2').textContent = kq_Model1['Sử_2'][index];
-        document.getElementById('model1Geography2').textContent = kq_Model1['Địa_2'][index];
-        document.getElementById('model1English2').textContent = kq_Model1['GDCD_2'][index];
-        document.getElementById('model1Civic2').textContent = kq_Model1['Anh_2'][index];
-
-        // Cập nhật giá trị cho Model 2
-        document.getElementById('model2Math1').textContent = kq_Model2['Toán_1'][index];
-        document.getElementById('model2Literature1').textContent = kq_Model2['Văn_1'][index];
-        document.getElementById('model2Physics1').textContent = kq_Model2['Lý_1'][index];
-        document.getElementById('model2Chemistry1').textContent = kq_Model2['Hóa_1'][index];
-        document.getElementById('model2Biology1').textContent = kq_Model2['Sinh_1'][index];
-        document.getElementById('model2History1').textContent = kq_Model2['Sử_1'][index];
-        document.getElementById('model2Geography1').textContent = kq_Model2['Địa_1'][index];
-        document.getElementById('model2English1').textContent = kq_Model2['GDCD_1'][index];
-        document.getElementById('model2Civic1').textContent = kq_Model2['Anh_1'][index];
-
-        document.getElementById('model2Math2').textContent = kq_Model2['Toán_2'][index];
-        document.getElementById('model2Literature2').textContent = kq_Model2['Văn_2'][index];
-        document.getElementById('model2Physics2').textContent = kq_Model2['Lý_2'][index];
-        document.getElementById('model2Chemistry2').textContent = kq_Model2['Hóa_2'][index];
-        document.getElementById('model2Biology2').textContent = kq_Model2['Sinh_2'][index];
-        document.getElementById('model2History2').textContent = kq_Model2['Sử_2'][index];
-        document.getElementById('model2Geography2').textContent = kq_Model2['Địa_2'][index];
-        document.getElementById('model2English2').textContent = kq_Model2['GDCD_2'][index];
-        document.getElementById('model2Civic2').textContent = kq_Model2['Anh_2'][index];
-
-        // Cập nhật giá trị cho Model 3
-        document.getElementById('model3Math1').textContent = kq_Model3['Toán_1'][index];
-        document.getElementById('model3Literature1').textContent = kq_Model3['Văn_1'][index];
-        document.getElementById('model3Physics1').textContent = kq_Model3['Lý_1'][index];
-        document.getElementById('model3Chemistry1').textContent = kq_Model3['Hóa_1'][index];
-        document.getElementById('model3Biology1').textContent = kq_Model3['Sinh_1'][index];
-        document.getElementById('model3History1').textContent = kq_Model3['Sử_1'][index];
-        document.getElementById('model3Geography1').textContent = kq_Model3['Địa_1'][index];
-        document.getElementById('model3English1').textContent = kq_Model3['GDCD_1'][index];
-        document.getElementById('model3Civic1').textContent = kq_Model3['Anh_1'][index];
-
-        document.getElementById('model3Math2').textContent = kq_Model3['Toán_2'][index];
-        document.getElementById('model3Literature2').textContent = kq_Model3['Văn_2'][index];
-        document.getElementById('model3Physics2').textContent = kq_Model3['Lý_2'][index];
-        document.getElementById('model3Chemistry2').textContent = kq_Model3['Hóa_2'][index];
-        document.getElementById('model3Biology2').textContent = kq_Model3['Sinh_2'][index];
-        document.getElementById('model3History2').textContent = kq_Model3['Sử_2'][index];
-        document.getElementById('model3Geography2').textContent = kq_Model3['Địa_2'][index];
-        document.getElementById('model3English2').textContent = kq_Model3['GDCD_2'][index];
-        document.getElementById('model3Civic2').textContent = kq_Model3['Anh_2'][index];
-    }
-
-    // Hàm để chuyển sang dữ liệu trước đó
-    function prevResult1() {
-        console.log(index);
-        if (index > 0) {
-            index--;
-        }
-        else{
-            index = names.length -1;
-        }
-        updateModelDisplay1();
-    }
-
-    // Hàm để chuyển sang dữ liệu tiếp theo
-    function nextResult1() {
-        console.log(index);
-        if (index < names.length - 1) {
-            index++;
-        }
-        else{
-            index = 0
-        }
-        updateModelDisplay1();
-    }
-
-    // Cập nhật khi trang load lần đầu
-    document.addEventListener('DOMContentLoaded', updateModelDisplay1);
-</script>
-{% endif %}
-
-<script>
-    function fireworkEffect() {
-        const container = document.querySelector('.firework-container');
-        
-        for (let i = 0; i < 30; i++) {
-            const firework = document.createElement('div');
-            firework.className = 'firework';
-            firework.style.width = firework.style.height = Math.random() * 30 + 10 + 'px';
-            firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-            firework.style.left = Math.random() * 100 + 'vw';
-            firework.style.top = Math.random() * 100 + 'vh';
-            firework.style.animationDelay = Math.random() * 1 + 's';
-            
-            // Thêm pháo hoa vào container
-            container.appendChild(firework);
-
-            // Xóa pháo hoa sau khi hiệu ứng kết thúc
-            firework.addEventListener('animationend', () => firework.remove());
-        }
-    }
-
-    // Tự động chạy hiệu ứng khi trang load
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            fireworkEffect();
-        }, 300); // Đợi 0.3s sau khi load trang rồi mới chạy hiệu ứng
-    });
-</script>
-
-<script>
-    function fireworkEffect() {
-        const container = document.querySelector('.firework-container');
-        
-        for (let i = 0; i < 30; i++) {
-            const firework = document.createElement('div');
-            firework.className = 'firework';
-            firework.style.width = firework.style.height = Math.random() * 30 + 10 + 'px';
-            firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-            firework.style.left = Math.random() * 100 + 'vw';
-            firework.style.top = Math.random() * 100 + 'vh';
-            firework.style.animationDelay = Math.random() * 1 + 's';
-            
-            // Thêm pháo hoa vào container
-            container.appendChild(firework);
-
-            // Xóa pháo hoa sau khi hiệu ứng kết thúc
-            firework.addEventListener('animationend', () => firework.remove());
-        }
-    }
-
-    // Tự động chạy hiệu ứng khi trang load
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            fireworkEffect();
-        }, 300); // Đợi 0.3s sau khi load trang rồi mới chạy hiệu ứng
-    });
-</script>

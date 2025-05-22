@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='Style/main.css') }}" rel="stylesheet" />
+    <title>EduPredictOps | Cấu hình Model</title>
+    <script src="{{ url_for('static', filename='Action/script.js') }}"></script>
+</head>
+<body>
+    <div class="container">    
+        <div class="header">
+            <div class="left_header">
+                <img class="logo" src="{{ url_for('static', filename='images/logo.png') }}">
+                <div class="footer">    
+                    <div class="footer-text1">UIT</div>
+                    <div class="footer-text2">Trang dành cho Admin</div>
+                </div>
+            </div>
+            <div class="admin-menu">
+                <div class="admin-icon" onclick="toggleDropdown(event)">
+                    <img src="{{ url_for('static', filename='images/logo_admin.png') }}" alt="Admin Icon" />
+                </div>
+            </div>
+        </div>
+        <div class="sub-header"></div>
+        <div class="main-content">
+            <div class="button-header">
+                <button class="btn-hoc12">
+                    <div class="btn-content">
+                        <div class="btn-icon"></div>
+                        <span class="btn-text">Page DashBoard</span>
+                    </div>
+                </button>
+                <button class="btn-hoc11">
+                    <div class="btn-content">
+                        <div class="btn-icon"></div>
+                        <span class="btn-text">Page Train Model</span>
+                    </div>
+                </button>
+            </div>
+            <div class="submit_count">
+                <p>Tổng số lần submit: <span id="total-submit">0</span></p>
+                <p>Số lần submit hôm nay: <span id="today-submit">0</span></p>
+            </div>   
+            <div class="model-config">
+                <h2>Chọn cấu hình mô hình</h2>
+                <form method="POST">
+                    <label>Loại mô hình:</label>
+                    <select name="model_type">
+                        <option value="MLP">MLP</option>
+                        <option value="LSTM">LSTM</option>
+                    </select><br><br>
+
+                    <label>Số lớp ẩn:</label>
+                    <input type="number" name="num_layers" value="3" min="1" max="5"><br><br>
+
+                    <label>Số neuron mỗi lớp (cách nhau bởi dấu phẩy):</label>
+                    <input type="text" name="units_list" value="128,64,32"><br><br>
+
+                    <label>Activation function:</label>
+                    <input type="text" name="activation" value="relu"><br><br>
+
+                    <label>Số output:</label>
+                    <input type="number" name="output_dim" value="18"><br><br>
+
+                    <button type="submit">Tạo mô hình</button>
+                </form>
+            </div> 
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+<script>
+    window.onload = function() {fetchSubmitDataFromBackend()}
+    document.addEventListener('keydown', function (e) {
+        const inputs = document.querySelectorAll('.form-group input');
+        let currentIndex = Array.from(inputs).indexOf(document.activeElement); 
+        if (e.key === 'ArrowDown') {
+            if (currentIndex < inputs.length - 1) {
+                inputs[currentIndex + 1].focus();
+            }
+        } else if (e.key === 'ArrowUp') {
+            if (currentIndex > 0) {
+                inputs[currentIndex - 1].focus();
+            }
+        }
+    });
+</script>

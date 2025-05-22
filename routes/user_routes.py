@@ -9,122 +9,11 @@ from tensorflow.keras.saving import register_keras_serializable
 from openpyxl.utils import get_column_letter
 import io, json
 from datetime import date, datetime
-from sklearn.linear_model import LinearRegression
-from models import db, SubmitData, PerformanceMulti, PerformanceSingle
-from flask_sqlalchemy import SQLAlchemy
 from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error, mean_squared_error, r2_score
 import psutil, time
+from databaseaction import get_all_schools_and_years, get_submit_data, log_performance_multi, log_performance_single, log_access
+from model import load_and_predict
 
-
-
-@register_keras_serializable()
-# Customize Model
-class MLPModel1(Model):
-    def __init__(self):
-        super(MLPModel1, self).__init__()
-        self.flatten = Flatten()
-        self.fc1 = Dense(128, activation='relu')
-        self.fc2 = Dense(62, activation='relu') 
-        self.fc3 = Dense(32, activation='relu')
-        self.fc4 = Dense(18, activation='linear') 
-    def call(self, inputs):
-        features = self.flatten(inputs)
-        features = self.fc1(features)
-        features = self.fc2(features)
-        features = self.fc3(features)
-        features = self.fc4(features)
-        return features
-    
-    def get_config(self):
-        config = super(MLPModel1, self).get_config()
-        # Return the config dictionary including any custom parameters
-        return config
-
-    @classmethod
-    def from_config(cls, config):
-        # Create a new instance of the model from the config
-        return cls()
-    
-@register_keras_serializable()
-class MLPModel2(Model):
-    def __init__(self):
-        super(MLPModel2, self).__init__()
-        self.flatten = Flatten()
-        self.fc1 = Dense(128, activation='relu')
-        self.fc2 = Dense(62, activation='relu') 
-        self.fc3 = Dense(32, activation='relu')
-        self.fc4 = Dense(6, activation='linear') 
-    def call(self, inputs):
-        features = self.flatten(inputs)
-        features = self.fc1(features)
-        features = self.fc2(features)
-        features = self.fc3(features)
-        features = self.fc4(features)
-        return features
-    
-    def get_config(self):
-        config = super(MLPModel2, self).get_config()
-        # Return the config dictionary including any custom parameters
-        return config
-
-    @classmethod
-    def from_config(cls, config):
-        # Create a new instance of the model from the config
-        return cls()
-
-@register_keras_serializable()
-class LSTMModel1(Model):
-    def __init__(self):
-        super(LSTMModel1, self).__init__()
-        self.LSTM1 = LSTM(128, activation = 'relu', return_sequences = True)
-        self.LSTM2 = LSTM(64, activation = 'relu', return_sequences= True)
-        self.LSTM3 = LSTM(32, activation = 'relu', return_sequences= False)
-        self.fc1 = Dense(18, activation = 'linear')
-
-
-    def call(self, inputs):
-        features = self.LSTM1(inputs)
-        features = self.LSTM2(features)
-        features = self.LSTM3(features)
-        features = self.fc1(features)
-        return features
-  
-    def get_config(self):
-        config = super(LSTMModel1, self).get_config()
-        # Return the config dictionary including any custom parameters
-        return config
-
-    @classmethod
-    def from_config(cls, config):
-        # Create a new instance of the model from the config
-        return cls()
-    
-@register_keras_serializable()
-class LSTMModel2(Model):
-    def __init__(self):
-        super(LSTMModel2, self).__init__()
-        self.LSTM1 = LSTM(128, activation = 'relu', return_sequences = True)
-        self.LSTM2 = LSTM(64, activation = 'relu', return_sequences= True)
-        self.LSTM3 = LSTM(32, activation = 'relu', return_sequences= False)
-        self.fc1 = Dense(6, activation = 'linear')
-
-
-    def call(self, inputs):
-        features = self.LSTM1(inputs)
-        features = self.LSTM2(features)
-        features = self.LSTM3(features)
-        features = self.fc1(features)
-        return features
-  
-    def get_config(self):
-        config = super(LSTMModel2, self).get_config()
-        # Return the config dictionary including any custom parameters
-        return config
-
-    @classmethod
-    def from_config(cls, config):
-        # Create a new instance of the model from the config
-        return cls()
 
 user_blueprint = Blueprint("user", __name__, template_folder = '../templates/user')
 
@@ -166,6 +55,7 @@ def page6():
 
     return render_template('Page6.html', subjects=subjects)
 
+
 def predModel1(ypred): # hiển thị kết quả cho model 1
     pred = pd.DataFrame({
         'Toán_1': pd.Series(ypred[:,0]),
@@ -206,7 +96,8 @@ def predModel2(ypred): # hiển thị kết quả cho model 2
     
 @user_blueprint.route("predict1", methods = ['GET','POST'])
 def predict1():
-    log_access('/predict1')
+    school_name = request.form.get('schoolName')
+    log_access('/predict1', school_name)
     start_time = time.time()  # Bắt đầu đo thời gian
     cpu_start = psutil.cpu_percent(interval=None)  # Lấy CPU ban đầu
     memory_start = psutil.Process().memory_info().rss / (1024 ** 2)
@@ -274,22 +165,11 @@ def predict1():
             pred_arg_arr = np.array(pred_arg)
             pred_arg_arr = pred_arg_arr.reshape(1,-1)
             # Model LR được lưu bằng joblib, 2 model còn lại MLP và LSTM được lưu băng Karas
-            def load_and_predict(model_path, model_type):
-                if model_type == 'keras':
-                    model = load_model(f"Models/{model_path}")  # Load model Keras
-                else:
-                    with open(f"Models/{model_path}", 'rb') as model_file:
-                        model = joblib.load(model_file)  # Load model với joblib
-
-                if model_type == 'keras' and "LSTM" in model_path:  # Kiểm tra xem đây có phải là model LSTM không để reshape thành 3 chiều
-                    return model.predict(pred_arg_arr.reshape(pred_arg_arr.shape[0], 1, pred_arg_arr.shape[1]))
-                else:
-                    return model.predict(pred_arg_arr)
             # Thực hiện dự đoán song song trên cả 3 model
             with ThreadPoolExecutor() as executor:
-                future1 = executor.submit(load_and_predict, "LR_10_11_12.pkl", model_type='joblib')
-                future2 = executor.submit(load_and_predict, "MLP_10_11_12.keras", model_type='keras')
-                future3 = executor.submit(load_and_predict, "LSTM_10_11_12.keras", model_type='keras')
+                future1 = executor.submit(load_and_predict, school_name, "LR_10_11_12.pkl", model_type='joblib',pred_arg_arr=pred_arg_arr)
+                future2 = executor.submit(load_and_predict, school_name, "MLP_10_11_12.keras", model_type='keras',pred_arg_arr=pred_arg_arr)
+                future3 = executor.submit(load_and_predict, school_name,"LSTM_10_11_12.keras", model_type='keras',pred_arg_arr=pred_arg_arr)
 
                 prediction1 = future1.result()
                 prediction2 = future2.result()
@@ -312,16 +192,14 @@ def predict1():
             avg_memory_usage = (memory_start + memory_end) / 2
             throughput = len(pred_arg_arr) / elapsed_time if elapsed_time > 0 else 0
 
-            # Lưu hiệu năng vào cơ sở dữ liệu
-            performance = PerformanceSingle(
-                timestamp=datetime.utcnow(),
-                latency=round(elapsed_time * 1000, 2),  # Tính độ trễ (ms)
-                throughput=round(throughput, 2),
-                cpu_usage=round(avg_cpu_usage, 2),
-                memory_usage=round(avg_memory_usage, 2),
-            )
-            db.session.add(performance)
-            db.session.commit()
+            performance = {}
+            performance['timestamp']=datetime.utcnow()
+            performance['latency']=round(elapsed_time * 1000, 2),  # Tính độ trễ (ms)
+            performance['throughput']=round(throughput, 2),
+            performance['cpu_usage']=round(avg_cpu_usage, 2),
+            performance['memory_usage']=round(avg_memory_usage, 2),
+            log_performance_multi(school_name = school_name, performance=performance)
+
                 
 
         except Exception as e:
@@ -334,9 +212,11 @@ def predict1():
     kq_Model3=pred_df3.to_dict(orient='list') if pred_df3 is not None else {},
 )
 
+
 @user_blueprint.route("/predict2", methods = ['GET','POST'])
 def predict2():
-    log_access('/predict2')
+    school_name = request.form.get('schoolName')
+    log_access('/predict2', school_name)
     start_time = time.time()  # Bắt đầu đo thời gian
     cpu_start = psutil.cpu_percent(interval=None)  # Lấy CPU ban đầu
     memory_start = psutil.Process().memory_info().rss / (1024 ** 2)
@@ -422,30 +302,19 @@ def predict2():
             
             pred_arg_arr = np.array(pred_arg)
             pred_arg_arr = pred_arg_arr.reshape(1,-1)
-            def load_and_predict(model_path, model_type):
-                if model_type == 'keras':
-                    model = load_model(f"Models/{model_path}")  # Load model Keras
-                else:
-                    with open(f"Models/{model_path}", 'rb') as model_file:
-                        model = joblib.load(model_file)  # Load model với joblib
-
-                if model_type == 'keras' and "LSTM" in model_path:  # Kiểm tra xem đây có phải là model LSTM không
-                    return model.predict(pred_arg_arr.reshape(pred_arg_arr.shape[0], 1, pred_arg_arr.shape[1]))
-                else:
-                    return model.predict(pred_arg_arr)
             nature_checked = True if 'nature' in request.form else False
             subjects = {}
 
             with ThreadPoolExecutor() as executor:
                 if nature_checked:
-                    future1 = executor.submit(load_and_predict, "LR_TN_TN.pkl", model_type='joblib')
-                    future2 = executor.submit(load_and_predict, "MLP_TN_TN.keras", model_type='keras')
-                    future3 = executor.submit(load_and_predict, "LSTM_TN_TN.keras", model_type='keras')
+                    future1 = executor.submit(load_and_predict, school_name, "LR_TN_TN.pkl", model_type='joblib',pred_arg_arr=pred_arg_arr)
+                    future2 = executor.submit(load_and_predict, school_name, "MLP_TN_TN.keras", model_type='keras',pred_arg_arr=pred_arg_arr)
+                    future3 = executor.submit(load_and_predict, school_name, "LSTM_TN_TN.keras", model_type='keras',pred_arg_arr=pred_arg_arr)
                     subjects = {'mon1': 'Điểm Lý', 'mon1_1': 'Physics', 'mon2': 'Điểm Hóa', 'mon2_1': 'Chemistry', 'mon3': 'Điểm Sinh', 'mon3_1':  'Biology', 'type':  'TN'}
                 else:
-                    future1 = executor.submit(load_and_predict, "LR_TN_XH.pkl", model_type='joblib')
-                    future2 = executor.submit(load_and_predict, "MLP_TN_XH.keras", model_type='keras')
-                    future3 = executor.submit(load_and_predict, "LSTM_TN_XH.keras", model_type='keras')
+                    future1 = executor.submit(load_and_predict, school_name, "LR_TN_XH.pkl", model_type='joblib',pred_arg_arr=pred_arg_arr)
+                    future2 = executor.submit(load_and_predict, school_name, "MLP_TN_XH.keras", model_type='keras',pred_arg_arr=pred_arg_arr)
+                    future3 = executor.submit(load_and_predict, school_name, "LSTM_TN_XH.keras", model_type='keras',pred_arg_arr=pred_arg_arr)
                     subjects = {'mon1': 'Điểm Sử', 'mon1_1': 'History', 'mon2': 'Điểm Địa', 'mon2_1': 'Geography', 'mon3': 'Điểm GDCD', 'mon3_1':  'Civic Education', 'type':  'XH'}
                 prediction1 = future1.result()
                 prediction2 = future2.result()
@@ -468,16 +337,13 @@ def predict2():
             avg_memory_usage = (memory_start + memory_end) / 2
             throughput = len(pred_arg_arr) / elapsed_time if elapsed_time > 0 else 0
 
-            # Lưu hiệu năng vào cơ sở dữ liệu
-            performance = PerformanceSingle(
-                timestamp=datetime.utcnow(),
-                latency=round(elapsed_time * 1000, 2),  # Tính độ trễ (ms)
-                throughput=round(throughput, 2),
-                cpu_usage=round(avg_cpu_usage, 2),
-                memory_usage=round(avg_memory_usage, 2),
-            )
-            db.session.add(performance)
-            db.session.commit()
+            performance = {}
+            performance['timestamp']=datetime.utcnow()
+            performance['latency']=round(elapsed_time * 1000, 2),  # Tính độ trễ (ms)
+            performance['throughput']=round(throughput, 2),
+            performance['cpu_usage']=round(avg_cpu_usage, 2),
+            performance['memory_usage']=round(avg_memory_usage, 2),
+            log_performance_single(school_name = school_name, performance=performance)
                 
         except Exception as e:
             print(f"Lỗi khi tải mô hình: {e}")
@@ -492,7 +358,8 @@ def predict2():
 
 @user_blueprint.route("/predict_excel1", methods=['GET', 'POST'])
 def predict_excel1():
-    log_access('/predict_excel1')
+    school_name = request.form.get('schoolName')
+    log_access('/predict_excel1', school_name)
     start_time = time.time()  # Bắt đầu đo thời gian
     cpu_start = psutil.cpu_percent(interval=None)  # Lấy CPU ban đầu
     memory_start = psutil.Process().memory_info().rss / (1024 ** 2)
@@ -507,9 +374,9 @@ def predict_excel1():
             pred_arg_arr = df.to_numpy()
             def load_and_predict(model_path, model_type):
                 if model_type == 'keras':
-                    model = load_model(f"Models/{model_path}")  # Load model Keras
+                    model = load_model(f"{school_name}/Models/{model_path}")  # Load model Keras
                 else:
-                    with open(f"Models/{model_path}", 'rb') as model_file:
+                    with open(f"{school_name}/Models/{model_path}", 'rb') as model_file:
                         model = joblib.load(model_file)  # Load model với joblib
 
                 if model_type == 'keras' and "LSTM" in model_path:  # Kiểm tra xem đây có phải là model LSTM không
@@ -519,9 +386,9 @@ def predict_excel1():
 
            
             with ThreadPoolExecutor() as executor:
-                future1 = executor.submit(load_and_predict, "LR_10_11_12.pkl", model_type='joblib')
-                future2 = executor.submit(load_and_predict, "MLP_10_11_12.keras", model_type='keras')
-                future3 = executor.submit(load_and_predict, "LSTM_10_11_12.keras", model_type='keras')
+                future1 = executor.submit(load_and_predict, school_name, "LR_10_11_12.pkl", model_type='joblib', pred_arg_arr=pred_arg_arr)
+                future2 = executor.submit(load_and_predict, school_name, "MLP_10_11_12.keras", model_type='keras',pred_arg_arr=pred_arg_arr)
+                future3 = executor.submit(load_and_predict, school_name, "LSTM_10_11_12.keras", model_type='keras',pred_arg_arr=pred_arg_arr)
 
                 prediction1 = future1.result()
                 prediction2 = future2.result()
@@ -545,16 +412,14 @@ def predict_excel1():
             throughput = len(pred_arg_arr) / elapsed_time if elapsed_time > 0 else 0
 
             # Lưu hiệu năng vào cơ sở dữ liệu
-            performance = PerformanceMulti(
-                timestamp=datetime.utcnow(),
-                latency=round(elapsed_time * 1000, 2),  # Tính độ trễ (ms)
-                throughput=round(throughput, 2),
-                cpu_usage=round(avg_cpu_usage, 2),
-                memory_usage=round(avg_memory_usage, 2),
-                total_predictions=len(pred_arg_arr)
-            )
-            db.session.add(performance)
-            db.session.commit()
+            performance = {}
+            performance['timestamp']=datetime.utcnow()
+            performance['latency']=round(elapsed_time * 1000, 2),  # Tính độ trễ (ms)
+            performance['throughput']=round(throughput, 2),
+            performance['cpu_usage']=round(avg_cpu_usage, 2),
+            performance['memory_usage']=round(avg_memory_usage, 2),
+            performance['total_predictions']=len(pred_arg_arr)
+            log_performance_multi(school_name = school_name, performance=performance)
                 
         except Exception as e:
             print(f"Lỗi khi tải mô hình: {e}")
@@ -564,13 +429,14 @@ def predict_excel1():
     kq_Model1=pred_df1.to_dict(orient='list') if pred_df1 is not None else {},
     kq_Model2=pred_df2.to_dict(orient='list') if pred_df2 is not None else {},
     kq_Model3=pred_df3.to_dict(orient='list') if pred_df3 is not None else {},
-    names=names
+    names=names,
+    school_name = school_name
 )
 
 
 @user_blueprint.route('/download_excel1', methods=['POST'])
 def download_excel1():
-
+    school_name = request.form.get('schoolName')
     names = request.form.getlist('names')
     kq_Model1 = request.form.getlist('kq_Model1')
     kq_Model2 = request.form.getlist('kq_Model2')
@@ -681,13 +547,14 @@ def download_excel1():
     output.seek(0)
 
     # Trả về file Excel để tải xuống
-    return send_file(output, as_attachment=True, download_name='Dự đoán điểm Trung Bình lớp 12.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    return send_file(output, as_attachment=True, download_name=f'Dự đoán điểm Trung Bình lớp 12 Trường {school_name}.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 
 
 @user_blueprint.route("/predict_excel2", methods=['GET', 'POST'])
 def predict_excel2():
-    log_access('/predict_excel2')
+    school_name = request.form.get('schoolName')
+    log_access('/predict_excel2', school_name)
     start_time = time.time()  # Bắt đầu đo thời gian
     cpu_start = psutil.cpu_percent(interval=None)  # Lấy CPU ban đầu
     memory_start = psutil.Process().memory_info().rss / (1024 ** 2)  # Lấy Memory ban đầu
@@ -696,20 +563,10 @@ def predict_excel2():
             excel_file = request.files['excel_file']
             df = pd.read_excel(excel_file,header=None, skiprows=1)  
             names = df.iloc[:, 0].tolist() 
-            df = df.drop(columns=0) 
+            df = df.drop(columns=0)
             df = df.iloc[:, :55]
             pred_arg_arr = df.to_numpy()
-            def load_and_predict(model_path, model_type):
-                if model_type == 'keras':
-                    model = load_model(f"Models/{model_path}")  # Load model Keras
-                else:
-                    with open(f"Models/{model_path}", 'rb') as model_file:
-                        model = joblib.load(model_file)  # Load model với joblib
 
-                if model_type == 'keras' and "LSTM" in model_path:  # Kiểm tra xem đây có phải là model LSTM không
-                    return model.predict(pred_arg_arr.reshape(pred_arg_arr.shape[0], 1, pred_arg_arr.shape[1]))
-                else:
-                    return model.predict(pred_arg_arr)
 
             # Kiểm tra checkbox TN (Tự nhiên) hay XH (Xã hội)
             nature_checked = True if 'nature' in request.form else False
@@ -717,9 +574,9 @@ def predict_excel2():
 
             with ThreadPoolExecutor() as executor:
                 if nature_checked:
-                    future1 = executor.submit(load_and_predict, "LR_TN_TN.pkl", model_type='joblib')
-                    future2 = executor.submit(load_and_predict, "MLP_TN_TN.keras", model_type='keras')
-                    future3 = executor.submit(load_and_predict, "LSTM_TN_TN.keras", model_type='keras')
+                    future1 = executor.submit(load_and_predict, school_name, "LR_TN_TN.pkl", model_type='joblib',pred_arg_arr=pred_arg_arr)
+                    future2 = executor.submit(load_and_predict, school_name, "MLP_TN_TN.keras", model_type='keras',pred_arg_arr=pred_arg_arr)
+                    future3 = executor.submit(load_and_predict, school_name, "LSTM_TN_TN.keras", model_type='keras',pred_arg_arr=pred_arg_arr)
                     subjects = {'mon1': 'Điểm Lý', 'mon1_1': 'Physics', 'mon2': 'Điểm Hóa', 'mon2_1': 'Chemistry', 'mon3': 'Điểm Sinh', 'mon3_1': 'Biology', 'type': 'TN'}
                 else:
                     future1 = executor.submit(load_and_predict, "LR_TN_XH.pkl", model_type='joblib')
@@ -748,17 +605,15 @@ def predict_excel2():
             avg_memory_usage = (memory_start + memory_end) / 2
             throughput = len(pred_arg_arr) / elapsed_time if elapsed_time > 0 else 0
 
-            # Lưu hiệu năng vào cơ sở dữ liệu
-            performance = PerformanceMulti(
-                timestamp=datetime.utcnow(),
-                latency=round(elapsed_time * 1000, 2),  # Tính độ trễ (ms)
-                throughput=round(throughput, 2),
-                cpu_usage=round(avg_cpu_usage, 2),
-                memory_usage=round(avg_memory_usage, 2),
-                total_predictions=len(pred_arg_arr)
-            )
-            db.session.add(performance)
-            db.session.commit()
+
+            performance = {}
+            performance['timestamp']=datetime.utcnow()
+            performance['latency']=round(elapsed_time * 1000, 2),  # Tính độ trễ (ms)
+            performance['throughput']=round(throughput, 2),
+            performance['cpu_usage']=round(avg_cpu_usage, 2),
+            performance['memory_usage']=round(avg_memory_usage, 2),
+            performance['total_predictions']=len(pred_arg_arr)
+            log_performance_multi(school_name = school_name, performance=performance)
 
 
         except Exception as e:
@@ -770,11 +625,13 @@ def predict_excel2():
     kq_Model2=pred_df2.to_dict(orient='list') if pred_df2 is not None else {},
     kq_Model3=pred_df3.to_dict(orient='list') if pred_df3 is not None else {},
     subjects=subjects,
-    names=names
+    names=names,
+    school_name = school_name
 )
 
 @user_blueprint.route('/download_excel2', methods=['POST'])
 def download_excel2():
+    school_name = request.form.getlist('school_name')
     names = request.form.getlist('names')
     kq_Model1 = request.form.getlist('kq_Model1')
     kq_Model2 = request.form.getlist('kq_Model2')
@@ -848,89 +705,15 @@ def download_excel2():
     output.seek(0)
 
     # Trả về file Excel để tải xuống
-    return send_file(output, as_attachment=True, download_name='Dự đoán điểm thi Tốt Nghiệp.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    return send_file(output, as_attachment=True, download_name=f'Dự đoán điểm thi Tốt Nghiệp {school_name}.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 
+@user_blueprint.route('/get_schools', methods =['GET'])
+def get_schools():
+    data = get_all_schools_and_years()
+    return jsonify(data)
 
-
-
-
-
-def log_access(endpoint):
-    today = date.today()
-    submit_data = SubmitData.query.first()
-
-    if not submit_data:
-        # Nếu không có dữ liệu, khởi tạo mới
-        submit_data = SubmitData(
-            total_submits=1,
-            submits_today=1,
-            last_day_submit=today
-        )
-        db.session.add(submit_data)
-    else:
-        if submit_data.last_day_submit.date() != today:
-            # Reset số lần submit trong ngày nếu là ngày mới
-            submit_data.submits_today = 1
-            submit_data.last_day_submit = today
-        else:
-            # Tăng số lần submit trong ngày nếu cùng ngày
-            submit_data.submits_today += 1
-            submit_data.total_submits += 1
-
-    db.session.commit()
-
-
-def log_single_performance(latency, throughput):
-    metrics = PerformanceSingle(
-        latency=latency,
-        throughput=throughput,
-        cpu_usage=psutil.cpu_percent(interval=1),
-        memory_usage=psutil.virtual_memory().percent
-    )
-    db.session.add(metrics)
-    db.session.commit()
-
-
-
-def log_multi_performance(latency, throughput, total_predictions):
-    metrics = PerformanceMulti(
-        latency=latency,
-        throughput=throughput,
-        cpu_usage=psutil.cpu_percent(interval=1),
-        memory_usage=psutil.virtual_memory().percent,
-        total_predictions=total_predictions
-    )
-    db.session.add(metrics)
-    db.session.commit()
-
-@user_blueprint.route('/get_submit_data', methods=['GET'])
+@user_blueprint.route('/get_submit_data', methods =['GET'])
 def get_submit_data():
-    try:
-        submit_data = SubmitData.query.first()
-        today = date.today()
-
-        if not submit_data:
-            return jsonify({
-                'total_submit': 0,
-                'today_submit': 0
-            })
-        
-        # Reset số lần submit trong ngày (trường hợp ngày mới nhưng chưa reset)
-        if submit_data.last_day_submit.date() != today:
-            submit_data.submits_today = 0
-            submit_data.last_day_submit = today
-            db.session.commit()
-
-        return jsonify({
-            'total_submit': submit_data.total_submits,
-            'today_submit': submit_data.submits_today
-        })
-
-    except Exception as e:  
-        print("Error occurred:", e)
-        return jsonify({'error': 'Internal server error'}), 500
-    
-    
-
-
+    data = get_submit_data()
+    return jsonify(data)

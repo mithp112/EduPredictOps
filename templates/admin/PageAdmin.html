@@ -24,7 +24,7 @@
                     <div>Admin</div>
                     <ul>
                         <li>
-                            <form action="{{ url_for('admin.admin_logout') }}" method="POST" style="margin: 0;">
+                            <form action="{{ url_for('admin.adminLogout') }}" method="POST" style="margin: 0;">
                                 <button type="submit">Đăng xuất</button>
                             </form>
                         </li>
@@ -62,25 +62,7 @@
                 <label for="option3">Training Model TN_XH</label>
                 <input type="radio" id="option3" name="layoutOption" onclick="showLayout3in3()">
             </div>
-            <form id="layout1" class="layout" action="train_model_12" method="POST" enctype="multipart/form-data">
-                <div class="semester">Excel File</div>
-                <label for="excelFile">Excel Input:</label>
-                <input type="file" id="excelFile" name="excel_file" accept=".xlsx,.xls">
-                <button type="submit" class="btn-view-results">
-                    <div class="btn-view-content"></div>
-                    <span class="btn-view-text">Start Training</span>
-                </button>
-            </form>
-            <form id="layout2" class="layout" action="train_model_TN_TN" method="POST" enctype="multipart/form-data">
-                <div class="semester">Excel File</div>
-                <label for="excelFile">Excel Input:</label>
-                <input type="file" id="excelFile" name="excel_file" accept=".xlsx,.xls">
-                <button type="submit" class="btn-view-results">
-                    <div class="btn-view-content"></div>
-                    <span class="btn-view-text">Start Training</span>
-                </button>
-            </form>
-            <form id="layout1" class="layout" action="train_model_12" method="POST" enctype="multipart/form-data">
+            <form id="layout1" class="layout" action="train_model_12" method="POST" enctype="multipart/form-data" checked>
                 <div class="semester">Excel File</div>
                 <label for="excelFile">Excel Input:</label>
                 <input type="file" id="excelFile" name="excel_file" accept=".xlsx,.xls">
